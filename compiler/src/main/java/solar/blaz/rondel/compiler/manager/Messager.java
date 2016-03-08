@@ -42,4 +42,8 @@ public class Messager {
         messager.printMessage(Diagnostic.Kind.ERROR, message, element);
     }
 
+    public void warning(String message) {
+        messager.printMessage(Diagnostic.Kind.WARNING, message);
+    }
+
 }

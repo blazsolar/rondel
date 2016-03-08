@@ -32,4 +32,6 @@ public @interface Mvp {
 
     Class<?>[] modules() default {};
 
+    Class<?> parent() default Void.class;
+
 }

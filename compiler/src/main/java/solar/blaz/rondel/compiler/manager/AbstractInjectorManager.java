@@ -16,17 +16,24 @@
 
 package solar.blaz.rondel.compiler.manager;
 
+import android.view.View;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import dagger.Module;
+import solar.blaz.rondel.ComponentProvider;
+import solar.blaz.rondel.compiler.model.ComponentModel;
 
 import javax.lang.model.element.*;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.SimpleAnnotationValueVisitor6;
 import javax.lang.model.util.Types;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.google.auto.common.AnnotationMirrors.getAnnotationValue;
@@ -60,6 +67,39 @@ public abstract class AbstractInjectorManager {
                 return typeElement;
             } else {
                 messager.error("Component has to be interface.", typeElement);
+            }
+
+        }
+
+        return null;
+
+    }
+
+    protected TypeMirror verifyParent(Element element, TypeMirror componentClass) {
+
+        TypeElement voidElement = elementUtils.getTypeElement(Void.class.getCanonicalName());
+
+        TypeElement viewProviderElement = elementUtils.getTypeElement(View.class.getCanonicalName());
+        boolean isView = typesUtil.isSubtype(element.asType(), viewProviderElement.asType());
+
+        if (componentClass == null || typesUtil.isSubtype(componentClass, voidElement.asType())) {
+            if (isView) {
+                messager.error("View has to specify parent.", element);
+            }
+            return null; // no parent
+        } else {
+
+            // verify that is is provider
+            TypeElement componentProviderElement = elementUtils.getTypeElement(ComponentProvider.class.getCanonicalName());
+
+            if (isView) {
+                if (typesUtil.isSubtype(componentClass, componentProviderElement.asType())) {
+                    return componentClass;
+                } else {
+                    messager.error("Parent does not provide component.", element);
+                }
+            } else {
+                messager.error("Only View can specify parent.", element);
             }
 
         }
@@ -163,6 +203,31 @@ public abstract class AbstractInjectorManager {
     protected TypeMirror convertClassToType(
             AnnotationMirror annotationMirror, String elementName) {
         return TO_TYPE.visit(getAnnotationValue(annotationMirror, elementName));
+    }
+
+    protected List<MethodSpec> getChildMethodBuilders(List<ComponentModel> children) {
+
+        if (children != null && children.size() > 0) {
+
+            List<MethodSpec> methods = new ArrayList<MethodSpec>(children.size());
+
+            for (ComponentModel child : children) {
+
+                String name = child.component.getSimpleName().toString();
+
+                methods.add(MethodSpec.methodBuilder(Character.toLowerCase(name.charAt(0)) + name.substring(1) + "Builder")
+                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                        .returns(ClassName.get(child.packageName, "MVP" + name, "Builder"))
+                        .build());
+
+            }
+
+            return methods;
+
+        } else {
+            return Collections.emptyList();
+        }
+
     }
 
     private static final AnnotationValueVisitor<ImmutableList<TypeMirror>, String> TO_LIST_OF_TYPES =

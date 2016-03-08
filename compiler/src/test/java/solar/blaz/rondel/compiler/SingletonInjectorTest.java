@@ -43,7 +43,7 @@ public class SingletonInjectorTest {
         JavaFileObject mvpFile = JavaFileObjects.forSourceString("test.SampleActivity", "package test;\n" +
                 "\n" +
                 "import android.app.Activity;\n" +
-                "import solar.blaz.dagger.mvp.Mvp;\n" +
+                "import solar.blaz.rondel.Mvp;\n" +
                 "\n" +
                 "@Mvp\n" +
                 "public class SampleActivity extends Activity {\n" +
@@ -63,14 +63,14 @@ public class SingletonInjectorTest {
 
         JavaFileObject appFile = JavaFileObjects.forSourceString("test.App", "package test;\n" +
                 "\n" +
-                "@solar.blaz.dagger.mvp.App\n" +
+                "@solar.blaz.rondel.App\n" +
                 "public class App {\n" +
                 "    \n" +
                 "}");
 
         JavaFileObject app2File = JavaFileObjects.forSourceString("test.App2", "package test;\n" +
                 "\n" +
-                "@solar.blaz.dagger.mvp.App\n" +
+                "@solar.blaz.rondel.App\n" +
                 "public class App2 {\n" +
                 "    \n" +
                 "}");
@@ -97,7 +97,7 @@ public class SingletonInjectorTest {
 
         JavaFileObject appFile = JavaFileObjects.forSourceString("test.App", "package test;\n" +
                 "\n" +
-                "@solar.blaz.dagger.mvp.App(\n" +
+                "@solar.blaz.rondel.App(\n" +
                 "        modules = test.AppModule.class\n" +
                 ")\n" +
                 "public class App {\n" +
@@ -132,7 +132,7 @@ public class SingletonInjectorTest {
 
         JavaFileObject appFile = JavaFileObjects.forSourceString("test.App", "package test;\n" +
                 "\n" +
-                "@solar.blaz.dagger.mvp.App(\n" +
+                "@solar.blaz.rondel.App(\n" +
                 "        component = test.AppComponent.class,\n" +
                 "        modules = test.AppModule.class\n" +
                 ")\n" +
@@ -159,7 +159,7 @@ public class SingletonInjectorTest {
 
         JavaFileObject appFile = JavaFileObjects.forSourceString("test.App", "package test;\n" +
                 "\n" +
-                "@solar.blaz.dagger.mvp.App(\n" +
+                "@solar.blaz.rondel.App(\n" +
                 "        component = test.AppComponent.class\n" +
                 ")\n" +
                 "public class App {\n" +
@@ -191,7 +191,7 @@ public class SingletonInjectorTest {
 
         JavaFileObject appFile = JavaFileObjects.forSourceString("test.App", "package test;\n" +
                 "\n" +
-                "@solar.blaz.dagger.mvp.App(\n" +
+                "@solar.blaz.rondel.App(\n" +
                 "        component = test.AppComponent.class,\n" +
                 "        modules = test.AppModule.class\n" +
                 ")\n" +
@@ -231,7 +231,7 @@ public class SingletonInjectorTest {
 
         JavaFileObject appFile = JavaFileObjects.forSourceString("test.App", "package test;\n" +
                 "\n" +
-                "@solar.blaz.dagger.mvp.App(\n" +
+                "@solar.blaz.rondel.App(\n" +
                 "        component = test.AppComponent.class,\n" +
                 "        modules = test.AppModule.class\n" +
                 ")\n" +
@@ -254,7 +254,7 @@ public class SingletonInjectorTest {
                 "\n" +
                 "import dagger.Component;\n" +
                 "import javax.inject.Singleton;\n" +
-                "import solar.blaz.dagger.mvp.BaseAppComponent;\n" +
+                "import solar.blaz.rondel.BaseAppComponent;\n" +
                 "\n" +
                 "@Component(\n" +
                 "        modules = { AppModule.class }\n" +
@@ -297,7 +297,7 @@ public class SingletonInjectorTest {
 
         JavaFileObject appFile = JavaFileObjects.forSourceString("test.TestApp", "package test;\n" +
                 "\n" +
-                "import solar.blaz.dagger.mvp.App;\n" +
+                "import solar.blaz.rondel.App;\n" +
                 "\n" +
                 "@App(\n" +
                 "        component = test.TestAppComponent.class,\n" +
@@ -322,7 +322,7 @@ public class SingletonInjectorTest {
                 "\n" +
                 "import dagger.Component;\n" +
                 "import javax.inject.Singleton;\n" +
-                "import solar.blaz.dagger.mvp.BaseAppComponent;\n" +
+                "import solar.blaz.rondel.BaseAppComponent;\n" +
                 "\n" +
                 "@Component(\n" +
                 "        modules = { TestAppModule.class }\n" +
@@ -361,7 +361,7 @@ public class SingletonInjectorTest {
 
         JavaFileObject appFile = JavaFileObjects.forSourceString("test.TestApp", "package test;\n" +
                 "\n" +
-                "import solar.blaz.dagger.mvp.App;\n" +
+                "import solar.blaz.rondel.App;\n" +
                 "\n" +
                 "@App(\n" +
                 "        component = test.TestAppComponent.class,\n" +
@@ -385,7 +385,7 @@ public class SingletonInjectorTest {
                 "\n" +
                 "import dagger.Component;\n" +
                 "import javax.inject.Singleton;\n" +
-                "import solar.blaz.dagger.mvp.BaseAppComponent;\n" +
+                "import solar.blaz.rondel.BaseAppComponent;\n" +
                 "\n" +
                 "@Component(\n" +
                 "        modules = { TestAppModule.class }\n" +
@@ -426,7 +426,7 @@ public class SingletonInjectorTest {
 
         JavaFileObject appFile = JavaFileObjects.forSourceString("test.TestApp", "package test;\n" +
                 "\n" +
-                "import solar.blaz.dagger.mvp.App;\n" +
+                "import solar.blaz.rondel.App;\n" +
                 "\n" +
                 "@App(\n" +
                 "        component = test.TestAppComponent.class,\n" +
@@ -472,7 +472,7 @@ public class SingletonInjectorTest {
 
         JavaFileObject appFile = JavaFileObjects.forSourceString("test.TestApp", "package test;\n" +
                 "\n" +
-                "import solar.blaz.dagger.mvp.App;\n" +
+                "import solar.blaz.rondel.App;\n" +
                 "\n" +
                 "@App(\n" +
                 "        component = test.TestAppComponent.class,\n" +
@@ -497,7 +497,7 @@ public class SingletonInjectorTest {
                 "\n" +
                 "import dagger.Component;\n" +
                 "import javax.inject.Singleton;\n" +
-                "import solar.blaz.dagger.mvp.BaseAppComponent;\n" +
+                "import solar.blaz.rondel.BaseAppComponent;\n" +
                 "\n" +
                 "@Component(\n" +
                 "        modules = { TestAppModule.class }\n" +
@@ -544,7 +544,7 @@ public class SingletonInjectorTest {
 
         JavaFileObject appFile = JavaFileObjects.forSourceString("test.TestApp", "package test;\n" +
                 "\n" +
-                "import solar.blaz.dagger.mvp.App;\n" +
+                "import solar.blaz.rondel.App;\n" +
                 "\n" +
                 "@App(\n" +
                 "        component = test.TestAppComponent.class,\n" +
@@ -600,7 +600,7 @@ public class SingletonInjectorTest {
 
         JavaFileObject appFile = JavaFileObjects.forSourceString("test.TestApp", "package test;\n" +
                 "\n" +
-                "import solar.blaz.dagger.mvp.App;\n" +
+                "import solar.blaz.rondel.App;\n" +
                 "\n" +
                 "@App(\n" +
                 "        component = test.TestAppComponent.class,\n" +
@@ -629,7 +629,7 @@ public class SingletonInjectorTest {
                 "\n" +
                 "import dagger.Component;\n" +
                 "import javax.inject.Singleton;\n" +
-                "import solar.blaz.dagger.mvp.BaseAppComponent;\n" +
+                "import solar.blaz.rondel.BaseAppComponent;\n" +
                 "\n" +
                 "@Component(\n" +
                 "        modules = { TestAppModule.class, TestAppModule2.class }\n" +
@@ -673,7 +673,7 @@ public class SingletonInjectorTest {
 
         JavaFileObject appFile = JavaFileObjects.forSourceString("test.Test3App", "package test;\n" +
                 "\n" +
-                "import solar.blaz.dagger.mvp.App;\n" +
+                "import solar.blaz.rondel.App;\n" +
                 "\n" +
                 "@App(\n" +
                 "        component = test.Test2AppComponent.class,\n" +
@@ -700,7 +700,7 @@ public class SingletonInjectorTest {
                 "\n" +
                 "import dagger.Component;\n" +
                 "import javax.inject.Singleton;\n" +
-                "import solar.blaz.dagger.mvp.BaseAppComponent;\n" +
+                "import solar.blaz.rondel.BaseAppComponent;\n" +
                 "\n" +
                 "@Component(\n" +
                 "        modules = { Test1AppModule.class }\n" +

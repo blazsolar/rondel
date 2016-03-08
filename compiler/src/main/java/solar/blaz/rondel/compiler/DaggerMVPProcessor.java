@@ -18,8 +18,9 @@ package solar.blaz.rondel.compiler;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.LinkedListMultimap;
-import solar.blaz.dagger.mvp.App;
-import solar.blaz.dagger.mvp.Mvp;
+import solar.blaz.rondel.App;
+import solar.blaz.rondel.Mvp;
+import solar.blaz.rondel.compiler.manager.Messager;
 import solar.blaz.rondel.compiler.manager.SingletonInjectorManager;
 import solar.blaz.rondel.compiler.manager.ViewInjectorManager;
 import solar.blaz.rondel.compiler.model.ComponentModel;
@@ -31,7 +32,9 @@ import javax.inject.Inject;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.util.Types;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -42,6 +45,8 @@ public class DaggerMVPProcessor extends AbstractProcessor {
 
     @Inject SingletonInjectorManager singletonInjectorManager;
     @Inject ViewInjectorManager viewInjectorManager;
+    @Inject Messager messager;
+    @Inject Types typesUtil;
 
     private LinkedListMultimap<ComponentModel, ComponentModel> components = LinkedListMultimap.create();
 
@@ -65,6 +70,8 @@ public class DaggerMVPProcessor extends AbstractProcessor {
 
         if (singletonInjectorManager.hasComponent()) {
 
+            List<ComponentModel> componentModels = new ArrayList<ComponentModel>();
+
             ComponentModel appComponent = singletonInjectorManager.getComponent();
 
             Set<? extends Element> elements = env.getElementsAnnotatedWith(Mvp.class);
@@ -73,25 +80,30 @@ public class DaggerMVPProcessor extends AbstractProcessor {
 
                 ComponentModel componentModel = viewInjectorManager.parse(element);
                 if (componentModel != null) {
-                    components.put(appComponent, componentModel);
+                    componentModels.add(componentModel);
                 }
 
             }
 
-            try {
-
-                List<ComponentModel> children = components.get(appComponent);
-
-                if (children != null && children.size() > 0) {
-                    for (ComponentModel child : children) {
-                        viewInjectorManager.write(child, appComponent);
+            for (ComponentModel componentModel : componentModels) {
+                if (componentModel.parent == null) {
+                    components.put(appComponent, componentModel);
+                } else {
+                    for (ComponentModel parent : componentModels) {
+                        if (typesUtil.isSubtype(componentModel.parent, parent.element.asType())) {
+                            components.put(parent, componentModel);
+                        }
                     }
                 }
+            }
 
+            try {
+
+                List<ComponentModel> children = generateFiles(appComponent);
                 singletonInjectorManager.write(children);
 
             } catch (IOException e) {
-                e.printStackTrace();
+                messager.warning("Failed to write files.");
             }
 
         }
@@ -107,6 +119,20 @@ public class DaggerMVPProcessor extends AbstractProcessor {
     @Override
     public Set<String> getSupportedAnnotationTypes() {
         return ImmutableSet.of(Mvp.class.getName(), App.class.getName());
+    }
+
+    private List<ComponentModel> generateFiles(ComponentModel parent) throws IOException {
+
+        List<ComponentModel> children = components.get(parent);
+        if (children != null && children.size() > 0) {
+            for (ComponentModel child : children) {
+                List<ComponentModel> nestedChildren = generateFiles(child);
+                viewInjectorManager.write(child, parent, nestedChildren);
+            }
+        }
+
+        return children;
+
     }
 
 }

@@ -19,8 +19,8 @@ package solar.blaz.rondel.compiler.manager;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.squareup.javapoet.*;
-import solar.blaz.dagger.mvp.App;
-import solar.blaz.dagger.mvp.BaseAppComponent;
+import solar.blaz.rondel.App;
+import solar.blaz.rondel.BaseAppComponent;
 import solar.blaz.rondel.compiler.model.ComponentModel;
 import solar.blaz.rondel.compiler.model.InjectorModel;
 
@@ -48,7 +48,6 @@ public class SingletonInjectorManager extends AbstractInjectorManager {
     private final Messager messager;
     private final Elements elementUtils;
     private final Filer filer;
-    private final Types typesUtil;
 
     private ComponentModel appComponent;
 
@@ -58,7 +57,6 @@ public class SingletonInjectorManager extends AbstractInjectorManager {
         this.messager = messager;
         this.elementUtils = elementUtils;
         this.filer = filer;
-        this.typesUtil = types;
     }
 
     public ComponentModel parse(RoundEnvironment env) {
@@ -118,18 +116,7 @@ public class SingletonInjectorManager extends AbstractInjectorManager {
                 .addParameter(TypeName.get(appComponent.element.asType()), "app")
                 .build());
 
-        if (children != null && children.size() > 0) {
-            for (ComponentModel child : children) {
-
-                String name = child.component.getSimpleName().toString();
-
-                component.addMethod(MethodSpec.methodBuilder(Character.toLowerCase(name.charAt(0)) + name.substring(1) + "Builder")
-                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                        .returns(ClassName.get(child.packageName, "MVP" + name, "Builder"))
-                        .build());
-
-            }
-        }
+        component.addMethods(getChildMethodBuilders(children));
 
         JavaFile.builder(appComponent.packageName, component.build())
                 .indent("    ")

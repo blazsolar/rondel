@@ -43,7 +43,7 @@ repositories {
 }
 
 dependencies {
-    compile 'solar.blaz:dagger-mvp:1.0.0-SNAPSHOT'
+    compile 'solar.blaz:rondel:1.0.0-SNAPSHOT'
     compile 'com.google.dagger:dagger:2.1-SNAPSHOT'
     compile 'com.squareup:javapoet:1.5.1'
     compile 'com.google.guava:guava:19.0'

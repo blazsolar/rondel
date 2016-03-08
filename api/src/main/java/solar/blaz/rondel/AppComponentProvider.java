@@ -20,5 +20,5 @@ package solar.blaz.rondel;
  * Created by blazsolar on 25/02/16.
  */
 public interface AppComponentProvider {
-    <T extends BaseAppComponent> T getComponent();
+    BaseAppComponent getComponent();
 }

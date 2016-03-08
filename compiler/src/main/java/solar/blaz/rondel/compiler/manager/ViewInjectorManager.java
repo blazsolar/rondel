@@ -17,11 +17,12 @@
 package solar.blaz.rondel.compiler.manager;
 
 import android.app.Activity;
+import android.view.View;
 import com.google.common.collect.ImmutableList;
 import com.squareup.javapoet.*;
-import solar.blaz.dagger.mvp.BaseComponent;
-import solar.blaz.dagger.mvp.Mvp;
-import solar.blaz.dagger.mvp.ViewScope;
+import solar.blaz.rondel.BaseComponent;
+import solar.blaz.rondel.Mvp;
+import solar.blaz.rondel.ViewScope;
 import solar.blaz.rondel.compiler.model.ComponentModel;
 import solar.blaz.rondel.compiler.model.InjectorModel;
 
@@ -56,13 +57,19 @@ public class ViewInjectorManager extends AbstractInjectorManager {
         this.typesUtil = typesUtil;
     }
 
-    public ComponentModel parse(Element element) {
+    public ComponentModel parse( Element element) {
+
+        if (!isValidType(element)) {
+            return null;
+        }
 
         AnnotationMirror annotationMirror = getAnnotationMirror(element, Mvp.class).get();
 
         ImmutableList<TypeMirror> modules = convertClassArrayToListOfTypes(annotationMirror, "modules");
         TypeElement component = parseViewComponent(convertClassToType(annotationMirror, "component"));
         TypeElement[] modleElements = parseModuleElements(modules);
+
+        TypeMirror parent = verifyParent(element, convertClassToType(annotationMirror, "parent"));
 
         if (component != null && modleElements != null) {
             InjectorModel injectorModel = new InjectorModel(element);
@@ -79,6 +86,7 @@ public class ViewInjectorManager extends AbstractInjectorManager {
             componentModel.view = element.asType();
             componentModel.modules = modleElements;
             componentModel.component = component;
+            componentModel.parent = parent;
             componentModel.injector = injectorModel;
 
             return componentModel;
@@ -88,7 +96,7 @@ public class ViewInjectorManager extends AbstractInjectorManager {
 
     }
 
-    public void write(ComponentModel model, ComponentModel parent) throws IOException {
+    public void write(ComponentModel model, ComponentModel parent, List<ComponentModel> children) throws IOException {
 
         ClassName componentName = ClassName.get(model.component);
 
@@ -114,6 +122,7 @@ public class ViewInjectorManager extends AbstractInjectorManager {
                 .addSuperinterface(ClassName.get(BaseComponent.class))
                 .addSuperinterface(componentName)
                 .addType(getComponentBuilder(model))
+                .addMethods(getChildMethodBuilders(children))
                 .addMethod(MethodSpec.methodBuilder("inject")
                         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                         .addParameter(TypeName.get(model.view), "view")
@@ -206,9 +215,29 @@ public class ViewInjectorManager extends AbstractInjectorManager {
                     .add(formatBuilder.toString(), formatParams.toArray())
                     .build();
         } else {
+
+            List<Object> formatParams = new ArrayList<Object>();
+            formatParams.add(appClass);
+            formatParams.add(appClass);
+            formatParams.add(appComponentClass);
+            formatParams.add(appComponentClass);
+            formatParams.add(component);
+            formatParams.add(builderMethodName);
+
+            StringBuilder formatBuilder = new StringBuilder("$T activity = ($T) injectie.getContext();\n" +
+                    "$T baseComponent = ($T) activity.getComponent();\n" +
+                    "$T component = baseComponent.$L()\n");
+
+            formatBuilder.append(formatBuilderModule(model.modules, formatParams, model.view));
+
+            formatBuilder.append("        .build();\n" +
+                    "component.inject(injectie);\n" +
+                    "return component;");
+
             injectLogic = CodeBlock.builder()
-                    .addStatement("return null;")
+                    .add(formatBuilder.toString(), formatParams.toArray())
                     .build();
+
         }
 
         return MethodSpec.methodBuilder("inject")
@@ -217,6 +246,15 @@ public class ViewInjectorManager extends AbstractInjectorManager {
                 .addParameter(TypeName.get(model.view), "injectie")
                 .addCode(injectLogic)
                 .build();
+
+    }
+
+    private boolean isValidType(Element element) {
+
+        TypeElement activityElement = elementsUtil.getTypeElement(Activity.class.getCanonicalName());
+        TypeElement viewElement = elementsUtil.getTypeElement(View.class.getCanonicalName());
+        return typesUtil.isSubtype(element.asType(), activityElement.asType()) ||
+                typesUtil.isSubtype(element.asType(), viewElement.asType());
 
     }
 

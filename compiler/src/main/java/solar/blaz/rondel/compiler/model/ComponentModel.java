@@ -31,10 +31,12 @@ public class ComponentModel {
     public TypeElement[] modules;
     public TypeElement component;
     public Element element;
+    public TypeMirror parent;
 
     public InjectorModel injector;
 
     public ComponentModel(Element element) {
         this.element = element;
     }
+
 }
