@@ -48,10 +48,12 @@ public class ViewInjectorManager extends AbstractInjectorManager {
     private final Filer filer;
     private final Elements elementsUtil;
     private final Types typesUtil;
+    private final Messager messager;
 
     @Inject
     protected ViewInjectorManager(Messager messager, Elements elementUtils, Filer filer, Elements elementsUtil, Types typesUtil) {
         super(messager, elementUtils, typesUtil);
+        this.messager = messager;
         this.filer = filer;
         this.elementsUtil = elementsUtil;
         this.typesUtil = typesUtil;
@@ -66,28 +68,28 @@ public class ViewInjectorManager extends AbstractInjectorManager {
         AnnotationMirror annotationMirror = getAnnotationMirror(element, Mvp.class).get();
 
         ImmutableList<TypeMirror> modules = convertClassArrayToListOfTypes(annotationMirror, "modules");
-        TypeElement component = parseViewComponent(convertClassToType(annotationMirror, "component"));
+        TypeElement[] components = parseViewComponent(convertClassArrayToListOfTypes(annotationMirror, "components"));
         TypeElement[] modleElements = parseModuleElements(modules);
 
         TypeMirror parent = verifyParent(element, convertClassToType(annotationMirror, "parent"));
 
-        if (component != null && modleElements != null) {
+        if (modleElements != null) {
             InjectorModel injectorModel = new InjectorModel(element);
             injectorModel.name = "MVP" + element.getSimpleName();
-            injectorModel.packageName = ((PackageElement) element.getEnclosingElement()).getQualifiedName().toString();
+            injectorModel.packageName = elementsUtil.getPackageOf(element).getQualifiedName().toString();
             injectorModel.view = element.asType();
             injectorModel.modules = modleElements;
-            injectorModel.component = component;
             injectorModel.superType = ((TypeElement) element).getSuperclass();
 
             ComponentModel componentModel = new ComponentModel(element);
-            componentModel.name = "MVP" + component.getSimpleName().toString();
+            componentModel.name = "MVP" + element.getSimpleName() + "Component";
             componentModel.packageName = ((PackageElement) element.getEnclosingElement()).getQualifiedName().toString();
             componentModel.view = element.asType();
             componentModel.modules = modleElements;
-            componentModel.component = component;
+            componentModel.components = components;
             componentModel.parent = parent;
             componentModel.injector = injectorModel;
+            injectorModel.component = componentModel;
 
             return componentModel;
         } else {
@@ -97,8 +99,6 @@ public class ViewInjectorManager extends AbstractInjectorManager {
     }
 
     public void write(ComponentModel model, ComponentModel parent, List<ComponentModel> children) throws IOException {
-
-        ClassName componentName = ClassName.get(model.component);
 
         String[] moduleNames;
         TypeElement[] modules = model.modules;
@@ -115,21 +115,26 @@ public class ViewInjectorManager extends AbstractInjectorManager {
                 .addMember("modules", String.join(", ", moduleNames))
                 .build();
 
-        TypeSpec injector = TypeSpec.interfaceBuilder(model.name)
+        TypeSpec.Builder builder = TypeSpec.interfaceBuilder(model.name)
                 .addAnnotation(annotation)
                 .addAnnotation(ViewScope.class)
                 .addModifiers(Modifier.PUBLIC)
                 .addSuperinterface(ClassName.get(BaseComponent.class))
-                .addSuperinterface(componentName)
                 .addType(getComponentBuilder(model))
                 .addMethods(getChildMethodBuilders(children))
                 .addMethod(MethodSpec.methodBuilder("inject")
                         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                         .addParameter(TypeName.get(model.view), "view")
-                        .build())
-                .build();
+                        .build());
 
-        JavaFile.builder(model.packageName, injector)
+        if (model.components != null && model.components.length > 0) {
+            for (TypeElement component : model.components) {
+                ClassName componentName = ClassName.get(component);
+                builder.addSuperinterface(componentName);
+            }
+        }
+
+        JavaFile.builder(model.packageName, builder.build())
                 .indent("    ")
                 .build()
                 .writeTo(filer);
@@ -143,8 +148,8 @@ public class ViewInjectorManager extends AbstractInjectorManager {
         TypeElement module = model.modules[0];
         String moduleName = module.getSimpleName().toString();
         TypeName moduleType = TypeName.get(module.asType());
-        String name = model.component.getSimpleName().toString();
-        ClassName componentName = ClassName.bestGuess("MVP" + name);
+        String name = model.name;
+        ClassName componentName = ClassName.bestGuess(name);
         String methodName = Character.toLowerCase(moduleName.charAt(0)) + moduleName.substring(1);
 
         return TypeSpec.interfaceBuilder("Builder")
@@ -165,35 +170,40 @@ public class ViewInjectorManager extends AbstractInjectorManager {
 
     private void writeInjector(InjectorModel model, ComponentModel parent) throws IOException {
 
-        TypeSpec injector = TypeSpec.classBuilder(model.name)
-                .addMethod(injectMethod(model, parent))
-                .build();
+        MethodSpec injectMethod = injectMethod(model, parent);
 
-        JavaFile.builder(model.packageName, injector)
-                .indent("    ")
-                .build()
-                .writeTo(filer);
+        if (injectMethod != null) {
+            TypeSpec injector = TypeSpec.classBuilder(model.name)
+                    .addMethod(injectMethod)
+                    .build();
 
+            JavaFile.builder(model.packageName, injector)
+                    .indent("    ")
+                    .build()
+                    .writeTo(filer);
+        }
 
     }
 
     private MethodSpec injectMethod(InjectorModel model, ComponentModel parent) {
 
-        String name = model.component.getSimpleName().toString();
+        String name = model.component.name;
         String builderMethodName = Character.toLowerCase(name.charAt(0)) + name.substring(1) + "Builder";
-        ClassName component =  ClassName.get(model.packageName, "MVP" + name);
+        ClassName component =  ClassName.get(model.packageName, name);
 
         TypeElement typeElement = elementsUtil.getTypeElement(Activity.class.getCanonicalName());
         boolean isActivity = typesUtil.isSubtype(model.superType, typeElement.asType());
+        TypeElement viewElement = elementsUtil.getTypeElement(View.class.getCanonicalName());
+        boolean isView = typesUtil.isSubtype(model.superType, viewElement.asType());
 
         ClassName appClass = (ClassName) ClassName.get(parent.element.asType());
-        ClassName appComponentClass = ClassName.get(parent.packageName, "MVP" + parent.component.getSimpleName().toString());
+        ClassName appComponentClass = ClassName.get(parent.packageName, parent.name);
 
         CodeBlock injectLogic;
 
         if (isActivity) {
 
-            List<Object> formatParams = new ArrayList<Object>();
+            List<Object> formatParams = new ArrayList<>();
             formatParams.add(appClass);
             formatParams.add(appClass);
             formatParams.add(appComponentClass);
@@ -214,7 +224,7 @@ public class ViewInjectorManager extends AbstractInjectorManager {
             injectLogic = CodeBlock.builder()
                     .add(formatBuilder.toString(), formatParams.toArray())
                     .build();
-        } else {
+        } else if (isView) {
 
             List<Object> formatParams = new ArrayList<Object>();
             formatParams.add(appClass);
@@ -238,14 +248,21 @@ public class ViewInjectorManager extends AbstractInjectorManager {
                     .add(formatBuilder.toString(), formatParams.toArray())
                     .build();
 
+        } else {
+            messager.error("Injected view not valid type.", model.element);
+            injectLogic = null;
         }
 
-        return MethodSpec.methodBuilder("inject")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .returns(component)
-                .addParameter(TypeName.get(model.view), "injectie")
-                .addCode(injectLogic)
-                .build();
+        if (injectLogic != null) {
+            return MethodSpec.methodBuilder("inject")
+                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                    .returns(component)
+                    .addParameter(TypeName.get(model.view), "injectie")
+                    .addCode(injectLogic)
+                    .build();
+        } else {
+            return null;
+        }
 
     }
 

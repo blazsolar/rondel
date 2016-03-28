@@ -69,24 +69,25 @@ public class SingletonInjectorManager extends AbstractInjectorManager {
                     if (annotationMirrorOptional.isPresent()) {
                         AnnotationMirror annotationMirror = annotationMirrorOptional.get();
                         ImmutableList<TypeMirror> modules = convertClassArrayToListOfTypes(annotationMirror, "modules");
+                        ImmutableList<TypeMirror> components = convertClassArrayToListOfTypes(annotationMirror, "components");
 
-                        TypeElement componentElement = parseViewComponent(convertClassToType(annotationMirror, "component"));
                         TypeElement[] modleElements = parseModuleElements(modules);
+                        TypeElement[] componentElements = parseViewComponent(components);
 
-                        if (componentElement != null && modleElements != null) {
+                        if (modleElements != null) {
                             ComponentModel componentModel = new ComponentModel(app);
-                            componentModel.name = "MVP" + componentElement.getSimpleName().toString();
+                            componentModel.name = "MVP" + app.getSimpleName() + "Component";
                             componentModel.packageName = elementUtils.getPackageOf(app).getQualifiedName().toString();
                             componentModel.view = app.asType();
                             componentModel.modules = modleElements;
-                            componentModel.component = componentElement;
+                            componentModel.components = componentElements;
 
                             InjectorModel injectorModel = new InjectorModel(app);
                             injectorModel.name = "MVP" + app.getSimpleName();
                             injectorModel.packageName = elementUtils.getPackageOf(app).getQualifiedName().toString();
                             injectorModel.view = app.asType();
 
-                            injectorModel.component = componentElement;
+                            injectorModel.component = componentModel;
                             injectorModel.superType = ((TypeElement) app).getSuperclass();
                             injectorModel.modules = modleElements;
                             componentModel.injector = injectorModel;
@@ -137,8 +138,6 @@ public class SingletonInjectorManager extends AbstractInjectorManager {
 
     private TypeSpec.Builder createComponent(ComponentModel model) {
 
-        ClassName componentName = ClassName.bestGuess(model.component.getSimpleName().toString());
-
         TypeElement[] modules = model.modules;
 
         CodeBlock.Builder codeBlock = CodeBlock.builder()
@@ -159,20 +158,28 @@ public class SingletonInjectorManager extends AbstractInjectorManager {
                 .addMember("modules", codeBlock.build())
                 .build();
 
-        return TypeSpec.interfaceBuilder(model.name)
+        TypeSpec.Builder builder = TypeSpec.interfaceBuilder(model.name)
                 .addAnnotation(annotation)
                 .addAnnotation(ClassName.get("javax.inject", "Singleton"))
                 .addModifiers(Modifier.PUBLIC)
-                .addSuperinterface(BaseAppComponent.class)
-                .addSuperinterface(componentName);
+                .addSuperinterface(BaseAppComponent.class);
+
+        if (model.components != null && model.components.length > 0) {
+            for (TypeElement component : model.components) {
+                ClassName componentName = ClassName.bestGuess(component.getSimpleName().toString());
+                builder.addSuperinterface(componentName);
+            }
+        }
+
+        return builder;
 
     }
 
     private void writeAppInjector(InjectorModel model) throws IOException {
 
-        String name = model.component.getSimpleName().toString();
-        ClassName component =  ClassName.get(model.packageName, "MVP" + name);
-        ClassName daggerComponent =  ClassName.get(model.packageName, "DaggerMVP" + name);
+        String name = model.component.name;
+        ClassName component =  ClassName.get(model.component.packageName, name);
+        ClassName daggerComponent =  ClassName.get(model.component.packageName, "Dagger" + name);
 
         List<Object> formatParams = new ArrayList<Object>();
         formatParams.add(component);

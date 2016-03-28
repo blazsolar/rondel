@@ -29,7 +29,7 @@ import static com.google.testing.compile.JavaSourcesSubjectFactory.javaSources;
 /**
  * Created by blazsolar on 06/03/16.
  */
-public class ViewInjectorTest {
+public class NestedViewInjectorTest {
 
     @Test
     public void testNoParent() throws Exception {

@@ -29,7 +29,7 @@ public class ComponentModel {
     public String packageName;
     public TypeMirror view;
     public TypeElement[] modules;
-    public TypeElement component;
+    public TypeElement[] components;
     public Element element;
     public TypeMirror parent;
 

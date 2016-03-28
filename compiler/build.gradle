@@ -29,7 +29,7 @@ group 'solar.blaz'
 version '1.0.0-SNAPSHOT'
 
 apply plugin: 'java'
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 apply plugin: "jacoco"
 apply plugin: 'idea'
 apply plugin: "net.ltgt.apt"
@@ -39,24 +39,30 @@ sourceCompatibility = 1.8
 repositories {
     mavenCentral()
     mavenLocal()
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+    maven {
+        url "s3://kamino-maven/lib-release"
+        credentials(AwsCredentials) {
+            accessKey kaminoMavenAccessKey
+            secretKey kaminoMavenSecretKey
+        }
+    }
 }
 
 dependencies {
-    compile 'solar.blaz:rondel:1.0.0-SNAPSHOT'
-    compile 'com.google.dagger:dagger:2.1-SNAPSHOT'
+    compile project(':rondel')
+    compile 'com.google.dagger:dagger:2.1'
     compile 'com.squareup:javapoet:1.5.1'
     compile 'com.google.guava:guava:19.0'
     compile 'com.google.android:android:4.1.1.4'
     compile 'com.google.auto:auto-common:0.6'
 
-    apt 'com.google.dagger:dagger-compiler:2.1-SNAPSHOT'
+    apt 'com.google.dagger:dagger-compiler:2.1'
 
     testCompile 'junit:junit:4.11'
     testCompile 'com.google.truth:truth:0.28'
     testCompile 'com.google.testing.compile:compile-testing:0.8'
     testCompile files(org.gradle.internal.jvm.Jvm.current().getToolsJar())
-    testCompile 'com.google.dagger:dagger-compiler:2.1-SNAPSHOT'
+    testCompile 'com.google.dagger:dagger-compiler:2.1'
 }
 
 jacocoTestReport {
@@ -83,5 +89,22 @@ test {
                 '**.*_Provide*Factory*',
                 '**.*Factory*'
         ]
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            url "s3://kamino-maven/lib-snapshot"
+            credentials(AwsCredentials) {
+                accessKey kaminoMavenAccessKey
+                secretKey kaminoMavenSecretKey
+            }
+        }
+    }
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
     }
 }

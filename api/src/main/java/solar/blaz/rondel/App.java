@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface App {
 
-    Class<?> component() default Void.class;
+    Class<?>[] components() default {};
 
     Class<?>[] modules() default {};
 

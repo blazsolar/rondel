@@ -27,7 +27,7 @@ public class InjectorModel {
 
     public String name;
     public String packageName;
-    public TypeElement component;
+    public ComponentModel component;
     public TypeMirror view;
     public TypeMirror superType;
     public Element element;

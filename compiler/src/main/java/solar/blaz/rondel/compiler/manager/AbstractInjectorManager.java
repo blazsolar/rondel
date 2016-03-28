@@ -53,25 +53,33 @@ public abstract class AbstractInjectorManager {
         this.typesUtil = typesUtil;
     }
 
-    protected TypeElement parseViewComponent(TypeMirror componentClass) {
+    protected TypeElement[] parseViewComponent(ImmutableList<TypeMirror> components) {
 
-        TypeElement voidElement = elementUtils.getTypeElement(Void.class.getCanonicalName());
-
-        if (componentClass == null || typesUtil.isSubtype(componentClass, voidElement.asType())) {
-            messager.error("App component was no provided.");
+        if (components == null || components.size() == 0) {
+            return null;
         } else {
 
-            TypeElement typeElement = elementUtils.getTypeElement(componentClass.toString());
+            List<TypeElement> moduleElements = new ArrayList<>();
+            for (int i = 0; i < components.size(); i++) {
+                TypeMirror componentClass = components.get(i);
 
-            if (typeElement.getKind() == ElementKind.INTERFACE) {
-                return typeElement;
+                TypeElement component = elementUtils.getTypeElement(componentClass.toString());
+
+                if (component.getKind() == ElementKind.INTERFACE) {
+                    moduleElements.add(component);
+                } else {
+                    messager.error("Component has to be interface.", component);
+                }
+
+            }
+
+            if (moduleElements.isEmpty()) {
+                return null;
             } else {
-                messager.error("Component has to be interface.", typeElement);
+                return moduleElements.toArray(new TypeElement[moduleElements.size()]);
             }
 
         }
-
-        return null;
 
     }
 
@@ -135,8 +143,6 @@ public abstract class AbstractInjectorManager {
                 return null;
             }
         }
-
-
 
     }
 
@@ -213,11 +219,11 @@ public abstract class AbstractInjectorManager {
 
             for (ComponentModel child : children) {
 
-                String name = child.component.getSimpleName().toString();
+                String name = child.name;
 
                 methods.add(MethodSpec.methodBuilder(Character.toLowerCase(name.charAt(0)) + name.substring(1) + "Builder")
                         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                        .returns(ClassName.get(child.packageName, "MVP" + name, "Builder"))
+                        .returns(ClassName.get(child.packageName, name, "Builder"))
                         .build());
 
             }

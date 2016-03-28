@@ -3,9 +3,13 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/api/api.iml" filepath="$PROJECT_DIR$/api/api.iml" />
-      <module fileurl="file://$PROJECT_DIR$/api/rondel.iml" filepath="$PROJECT_DIR$/api/rondel.iml" />
-      <module fileurl="file://$PROJECT_DIR$/compiler/rondel-compiler.iml" filepath="$PROJECT_DIR$/compiler/rondel-compiler.iml" />
-      <module fileurl="file://$PROJECT_DIR$/rondel-project.iml" filepath="$PROJECT_DIR$/rondel-project.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/api/rondel.iml" filepath="$PROJECT_DIR$/.idea/modules/api/rondel.iml" group="rondel" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/compiler/rondel-compiler.iml" filepath="$PROJECT_DIR$/.idea/modules/compiler/rondel-compiler.iml" group="rondel-compiler" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/compiler/rondel-compiler_main.iml" filepath="$PROJECT_DIR$/.idea/modules/compiler/rondel-compiler_main.iml" group="rondel-compiler" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/compiler/rondel-compiler_test.iml" filepath="$PROJECT_DIR$/.idea/modules/compiler/rondel-compiler_test.iml" group="rondel-compiler" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rondel-project.iml" filepath="$PROJECT_DIR$/.idea/modules/rondel-project.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/api/rondel_main.iml" filepath="$PROJECT_DIR$/.idea/modules/api/rondel_main.iml" group="rondel" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/api/rondel_test.iml" filepath="$PROJECT_DIR$/.idea/modules/api/rondel_test.iml" group="rondel" />
     </modules>
   </component>
 </project>
