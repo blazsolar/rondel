@@ -33,7 +33,7 @@ dependencies {
 publishing {
     repositories {
         maven {
-            url "s3://kamino-maven/lib-snapshot"
+            url "s3://kamino-maven.s3.eu-central-1.amazonaws.com/lib-snapshot"
             credentials(AwsCredentials) {
                 accessKey kaminoMavenAccessKey
                 secretKey kaminoMavenSecretKey

@@ -734,4 +734,76 @@ public class SingletonInjectorTest {
 
     }
 
+    @Test
+    public void testPackageNames() throws Exception {
+
+
+        JavaFileObject moduleFile = JavaFileObjects.forSourceString("test.module.AppModule", "package test.module;\n" +
+                "\n" +
+                "import dagger.Module;\n" +
+                "import test.app.App;\n" +
+                "\n" +
+                "@Module\n" +
+                "public class AppModule {\n" +
+                "    \n" +
+                "    public AppModule(App app) {\n" +
+                "        \n" +
+                "    }\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject componentFile = JavaFileObjects.forSourceString("test.component.AppComponent", "package test.component;\n" +
+                "\n" +
+                "public interface AppComponent {\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject appFile = JavaFileObjects.forSourceString("test.app.App", "package test.app;\n" +
+                "\n" +
+                "@solar.blaz.rondel.App(\n" +
+                "        components = test.component.AppComponent.class,\n" +
+                "        modules = test.module.AppModule.class\n" +
+                ")\n" +
+                "public class App {\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.app.MVPApp", "package test.app;\n" +
+                "\n" +
+                "import test.module.AppModule;\n" +
+                "\n" +
+                "public class MVPApp {\n" +
+                "    public static MVPAppComponent inject(App injectie) {\n" +
+                "        MVPAppComponent component = DaggerMVPAppComponent.builder()\n" +
+                "                .appModule(new AppModule(injectie))\n" +
+                "                .build();\n" +
+                "        component.inject(injectie);\n" +
+                "        return component;}\n" +
+                "}");
+
+        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.app.MVPAppComponent", "package test.app;\n" +
+                "\n" +
+                "import dagger.Component;\n" +
+                "import javax.inject.Singleton;\n" +
+                "import solar.blaz.rondel.BaseAppComponent;\n" +
+                "import test.component.AppComponent;\n" +
+                "import test.module.AppModule\n" +
+                "\n" +
+                "@Component(\n" +
+                "        modules = { AppModule.class }\n" +
+                ")\n" +
+                "@Singleton\n" +
+                "public interface MVPAppComponent extends BaseAppComponent, AppComponent {\n" +
+                "    void inject(App app);\n" +
+                "}");
+
+        assertAbout(javaSources())
+                .that(ImmutableList.of(appFile, moduleFile, componentFile))
+                .processedWith(new DaggerMVPProcessor(), new ComponentProcessor())
+                .compilesWithoutError()
+                .and()
+                .generatesSources(expectedInjector, expectedComponent);
+
+
+    }
 }

@@ -166,7 +166,7 @@ public class SingletonInjectorManager extends AbstractInjectorManager {
 
         if (model.components != null && model.components.length > 0) {
             for (TypeElement component : model.components) {
-                ClassName componentName = ClassName.bestGuess(component.getSimpleName().toString());
+                ClassName componentName = ClassName.get(component);
                 builder.addSuperinterface(componentName);
             }
         }

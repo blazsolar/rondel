@@ -645,4 +645,119 @@ public class ActivityInjectorTest {
                 .withErrorContaining("Only View can specify parent.");
 
     }
+
+    @Test
+    public void testPackageNames() throws Exception {
+
+        JavaFileObject moduleFile = JavaFileObjects.forSourceString("test.AppModule", "package test;\n" +
+                "\n" +
+                "import dagger.Module;\n" +
+                "\n" +
+                "@Module\n" +
+                "public class AppModule {\n" +
+                "    \n" +
+                "    public AppModule(TestApp app) {\n" +
+                "        \n" +
+                "    }\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject appFile = JavaFileObjects.forSourceString("test.TestApp", "package test;\n" +
+                "\n" +
+                "import android.app.Application;\n" +
+                "import solar.blaz.rondel.App;\n" +
+                "import solar.blaz.rondel.AppComponentProvider;\n" +
+                "\n" +
+                "@App(\n" +
+                "        modules = AppModule.class\n" +
+                ")\n" +
+                "public class TestApp extends Application implements AppComponentProvider {\n" +
+                "    public MVPTestAppComponent getComponent() {\n" +
+                "        return null;\n" +
+                "    }\n" +
+                "}");
+
+        JavaFileObject activityModuleFile = JavaFileObjects.forSourceString("test.ui.module.TestModule", "package test.ui.module;\n" +
+                "\n" +
+                "import dagger.Module;\n" +
+                "\n" +
+                "@Module\n" +
+                "public class TestModule {\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject activityComponentFile = JavaFileObjects.forSourceString("test.ui.component.TestComponent", "package test.ui.component;\n" +
+                "\n" +
+                "import dagger.Component;\n" +
+                "\n" +
+                "@Component\n" +
+                "public interface TestComponent {\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject activityFile = JavaFileObjects.forSourceString("test.ui.activity.TestActivity", "package test.ui.activity;\n" +
+                "\n" +
+                "import android.app.Activity;\n" +
+                "import solar.blaz.rondel.Mvp;\n" +
+                "import test.ui.component.TestComponent;\n" +
+                "import test.ui.module.TestModule;\n" +
+                "\n" +
+                "@Mvp(\n" +
+                "        components = TestComponent.class,\n" +
+                "        modules = TestModule.class\n" +
+                ")\n" +
+                "public class TestActivity extends Activity {\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.ui.MVPTestActivity", "package test.ui.activity;\n" +
+                "\n" +
+                "import test.MVPTestAppComponent;\n" +
+                "import test.TestApp;\n" +
+                "\n" +
+                "class MVPTestActivity {\n" +
+                "    \n" +
+                "    public static MVPTestActivityComponent inject(TestActivity injectie) {\n" +
+                "        TestApp app = (TestApp) injectie.getApplicationContext();\n" +
+                "        MVPTestAppComponent baseComponent = (MVPTestAppComponent) app.getComponent();\n" +
+                "        MVPTestActivityComponent component = baseComponent.mVPTestActivityComponentBuilder()\n" +
+                "                .build();\n" +
+                "        component.inject(injectie);\n" +
+                "        return component;\n" +
+                "    }\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.ui.activity.MVPTestActivityComponent", "package test.ui.activity;\n" +
+                "\n" +
+                "import dagger.Subcomponent;\n" +
+                "import solar.blaz.rondel.BaseComponent;\n" +
+                "import solar.blaz.rondel.ViewScope;\n" +
+                "import test.ui.component.TestComponent;\n" +
+                "import test.ui.module.TestModule;\n" +
+                "\n" +
+                "@Subcomponent(\n" +
+                "        modules = TestModule.class\n" +
+                ")\n" +
+                "@ViewScope\n" +
+                "public interface MVPTestActivityComponent extends BaseComponent, TestComponent {\n" +
+                "    \n" +
+                "    void inject(TestActivity view);\n" +
+                "\n" +
+                "    @Subcomponent.Builder\n" +
+                "    interface Builder {\n" +
+                "        Builder testModule(TestModule module);\n" +
+                "        MVPTestActivityComponent build();\n" +
+                "    }\n" +
+                "    \n" +
+                "}");
+
+        assertAbout(javaSources())
+                .that(ImmutableList.of(appFile, moduleFile, activityFile, activityModuleFile, activityComponentFile))
+                .processedWith(new DaggerMVPProcessor(), new ComponentProcessor())
+                .compilesWithoutError()
+                .and()
+                .generatesSources(expectedInjector, expectedComponent);
+
+    }
 }
