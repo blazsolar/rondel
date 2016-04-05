@@ -17,6 +17,7 @@
 package solar.blaz.rondel.compiler.manager;
 
 import android.app.Activity;
+import android.app.Service;
 import android.view.View;
 import com.google.common.collect.ImmutableList;
 import com.squareup.javapoet.*;
@@ -193,6 +194,8 @@ public class ViewInjectorManager extends AbstractInjectorManager {
 
         TypeElement typeElement = elementsUtil.getTypeElement(Activity.class.getCanonicalName());
         boolean isActivity = typesUtil.isSubtype(model.superType, typeElement.asType());
+        TypeElement serviceElement = elementsUtil.getTypeElement(Service.class.getCanonicalName());
+        boolean isService = typesUtil.isSubtype(model.superType, serviceElement.asType());
         TypeElement viewElement = elementsUtil.getTypeElement(View.class.getCanonicalName());
         boolean isView = typesUtil.isSubtype(model.superType, viewElement.asType());
 
@@ -201,7 +204,7 @@ public class ViewInjectorManager extends AbstractInjectorManager {
 
         CodeBlock injectLogic;
 
-        if (isActivity) {
+        if (isActivity || isService) {
 
             List<Object> formatParams = new ArrayList<>();
             formatParams.add(appClass);
@@ -224,6 +227,7 @@ public class ViewInjectorManager extends AbstractInjectorManager {
             injectLogic = CodeBlock.builder()
                     .add(formatBuilder.toString(), formatParams.toArray())
                     .build();
+
         } else if (isView) {
 
             List<Object> formatParams = new ArrayList<Object>();
@@ -269,8 +273,10 @@ public class ViewInjectorManager extends AbstractInjectorManager {
     private boolean isValidType(Element element) {
 
         TypeElement activityElement = elementsUtil.getTypeElement(Activity.class.getCanonicalName());
+        TypeElement serviceElement = elementsUtil.getTypeElement(Service.class.getCanonicalName());
         TypeElement viewElement = elementsUtil.getTypeElement(View.class.getCanonicalName());
         return typesUtil.isSubtype(element.asType(), activityElement.asType()) ||
+                typesUtil.isSubtype(element.asType(), serviceElement.asType()) ||
                 typesUtil.isSubtype(element.asType(), viewElement.asType());
 
     }
