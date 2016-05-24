@@ -40,7 +40,7 @@ public class SingletonInjectorTest {
                 "    \n" +
                 "}");
 
-        JavaFileObject mvpFile = JavaFileObjects.forSourceString("test.SampleActivity", "package test;\n" +
+        JavaFileObject rondelFile = JavaFileObjects.forSourceString("test.SampleActivity", "package test;\n" +
                 "\n" +
                 "import android.app.Activity;\n" +
                 "import solar.blaz.rondel.Rondel;\n" +
@@ -51,7 +51,7 @@ public class SingletonInjectorTest {
                 "}");
 
         assertAbout(javaSources())
-                .that(ImmutableList.of(appFile, mvpFile))
+                .that(ImmutableList.of(appFile, rondelFile))
                 .processedWith(new RondelProcessor())
                 .failsToCompile()
                 .withErrorContaining("No App level view provided.");

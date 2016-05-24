@@ -67,7 +67,7 @@ public class NestedViewInjectorTest {
                 "        modules = AppModule.class\n" +
                 ")\n" +
                 "public class TestApp extends Application implements AppComponentProvider {\n" +
-                "    public MVPAppComponent getComponent() {\n" +
+                "    public RondelAppComponent getComponent() {\n" +
                 "        return null;\n" +
                 "    }\n" +
                 "}");
@@ -184,7 +184,7 @@ public class NestedViewInjectorTest {
                 "        modules = AppModule.class\n" +
                 ")\n" +
                 "public class TestApp extends Application implements AppComponentProvider {\n" +
-                "    public MVPAppComponent getComponent() {\n" +
+                "    public RondelAppComponent getComponent() {\n" +
                 "        return null;\n" +
                 "    }\n" +
                 "}");

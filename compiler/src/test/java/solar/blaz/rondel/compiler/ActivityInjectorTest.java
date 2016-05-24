@@ -325,7 +325,7 @@ public class ActivityInjectorTest {
     }
 
     @Test
-    public void testActivityMVP() throws Exception {
+    public void testActivityRondel() throws Exception {
 
         JavaFileObject moduleFile = JavaFileObjects.forSourceString("test.AppModule", "package test;\n" +
                 "\n" +

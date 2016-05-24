@@ -67,7 +67,7 @@ public class ViewInjectorTest {
                 "        modules = AppModule.class\n" +
                 ")\n" +
                 "public class TestApp extends Application implements AppComponentProvider {\n" +
-                "    public MVPAppComponent getComponent() {\n" +
+                "    public RondelAppComponent getComponent() {\n" +
                 "        return null;\n" +
                 "    }\n" +
                 "}");
@@ -184,7 +184,7 @@ public class ViewInjectorTest {
                 "        modules = AppModule.class\n" +
                 ")\n" +
                 "public class TestApp extends Application implements AppComponentProvider {\n" +
-                "    public MVPAppComponent getComponent() {\n" +
+                "    public RondelAppComponent getComponent() {\n" +
                 "        return null;\n" +
                 "    }\n" +
                 "}");
@@ -399,7 +399,7 @@ public class ViewInjectorTest {
                 "    \n" +
                 "}");
 
-        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.ui.view.MVPTestViewComponent", "package test.ui.view;\n" +
+        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.ui.view.RondelTestViewComponent", "package test.ui.view;\n" +
                 "\n" +
                 "import dagger.Subcomponent;\n" +
                 "import solar.blaz.rondel.BaseComponent;\n" +

@@ -32,7 +32,7 @@ import static com.google.testing.compile.JavaSourcesSubjectFactory.javaSources;
 public class ServiceInjectorTest {
 
     @Test
-    public void testServiceMVP() throws Exception {
+    public void testServiceRondel() throws Exception {
 
         JavaFileObject moduleFile = JavaFileObjects.forSourceString("test.AppModule", "package test;\n" +
                 "\n" +
