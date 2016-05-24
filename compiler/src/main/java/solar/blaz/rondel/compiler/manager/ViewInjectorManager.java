@@ -113,7 +113,7 @@ public class ViewInjectorManager extends AbstractInjectorManager {
         }
 
         AnnotationSpec annotation = AnnotationSpec.builder(ClassName.get("dagger", "Subcomponent"))
-                .addMember("modules", String.join(", ", moduleNames))
+                .addMember("modules", "{ " + String.join(", ", moduleNames) + " }")
                 .build();
 
         TypeSpec.Builder builder = TypeSpec.interfaceBuilder(model.name)
@@ -146,20 +146,26 @@ public class ViewInjectorManager extends AbstractInjectorManager {
 
     private TypeSpec getComponentBuilder(ComponentModel model) {
 
-        TypeElement module = model.modules[0];
-        String moduleName = module.getSimpleName().toString();
-        TypeName moduleType = TypeName.get(module.asType());
+        TypeSpec.Builder builder = TypeSpec.interfaceBuilder("Builder")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+
+        for (TypeElement module : model.modules) {
+
+            String moduleName = module.getSimpleName().toString();
+            TypeName moduleType = TypeName.get(module.asType());
+            String methodName = Character.toLowerCase(moduleName.charAt(0)) + moduleName.substring(1);
+
+            builder.addMethod(MethodSpec.methodBuilder(methodName)
+                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                    .returns(ClassName.bestGuess("Builder"))
+                    .addParameter(moduleType, "module")
+                    .build());
+        }
+
         String name = model.name;
         ClassName componentName = ClassName.bestGuess(name);
-        String methodName = Character.toLowerCase(moduleName.charAt(0)) + moduleName.substring(1);
 
-        return TypeSpec.interfaceBuilder("Builder")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .addMethod(MethodSpec.methodBuilder(methodName)
-                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                        .returns(ClassName.bestGuess("Builder"))
-                        .addParameter(moduleType, "module")
-                        .build())
+        return builder
                 .addMethod(MethodSpec.methodBuilder("build")
                         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                         .returns(componentName)

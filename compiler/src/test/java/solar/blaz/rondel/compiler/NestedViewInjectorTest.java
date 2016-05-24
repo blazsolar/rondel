@@ -406,7 +406,7 @@ public class NestedViewInjectorTest {
                 "import solar.blaz.rondel.ViewScope;\n" +
                 "\n" +
                 "@Subcomponent(\n" +
-                "        modules = TestViewModule.class\n" +
+                "        modules = { TestViewModule.class }\n" +
                 ")\n" +
                 "@ViewScope\n" +
                 "public interface MVPTestViewComponent extends BaseComponent, TestViewComponent {\n" +

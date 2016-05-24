@@ -134,7 +134,7 @@ public class ServiceInjectorTest {
                 "import solar.blaz.rondel.ViewScope;\n" +
                 "\n" +
                 "@Subcomponent(\n" +
-                "        modules = TestModule.class\n" +
+                "        modules = { TestModule.class }\n" +
                 ")\n" +
                 "@ViewScope\n" +
                 "public interface MVPTestServiceComponent extends BaseComponent, TestComponent {\n" +
