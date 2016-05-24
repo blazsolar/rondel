@@ -22,8 +22,9 @@ import android.view.View;
 import com.google.common.collect.ImmutableList;
 import com.squareup.javapoet.*;
 import solar.blaz.rondel.BaseComponent;
-import solar.blaz.rondel.Mvp;
+import solar.blaz.rondel.Rondel;
 import solar.blaz.rondel.ViewScope;
+import solar.blaz.rondel.compiler.Constants;
 import solar.blaz.rondel.compiler.model.ComponentModel;
 import solar.blaz.rondel.compiler.model.InjectorModel;
 
@@ -66,7 +67,7 @@ public class ViewInjectorManager extends AbstractInjectorManager {
             return null;
         }
 
-        AnnotationMirror annotationMirror = getAnnotationMirror(element, Mvp.class).get();
+        AnnotationMirror annotationMirror = getAnnotationMirror(element, Rondel.class).get();
 
         ImmutableList<TypeMirror> modules = convertClassArrayToListOfTypes(annotationMirror, "modules");
         TypeElement[] components = parseViewComponent(convertClassArrayToListOfTypes(annotationMirror, "components"));
@@ -76,14 +77,14 @@ public class ViewInjectorManager extends AbstractInjectorManager {
 
         if (modleElements != null) {
             InjectorModel injectorModel = new InjectorModel(element);
-            injectorModel.name = "MVP" + element.getSimpleName();
+            injectorModel.name = Constants.CLASS_PREFIX + element.getSimpleName();
             injectorModel.packageName = elementsUtil.getPackageOf(element).getQualifiedName().toString();
             injectorModel.view = element.asType();
             injectorModel.modules = modleElements;
             injectorModel.superType = ((TypeElement) element).getSuperclass();
 
             ComponentModel componentModel = new ComponentModel(element);
-            componentModel.name = "MVP" + element.getSimpleName() + "Component";
+            componentModel.name = Constants.CLASS_PREFIX + element.getSimpleName() + "Component";
             componentModel.packageName = ((PackageElement) element.getEnclosingElement()).getQualifiedName().toString();
             componentModel.view = element.asType();
             componentModel.modules = modleElements;

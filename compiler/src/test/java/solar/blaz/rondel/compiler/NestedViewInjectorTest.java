@@ -93,9 +93,9 @@ public class NestedViewInjectorTest {
         JavaFileObject activityFile = JavaFileObjects.forSourceString("test.ui.TestActivity", "package test.ui;\n" +
                 "\n" +
                 "import android.app.Activity;\n" +
-                "import solar.blaz.rondel.Mvp;\n" +
+                "import solar.blaz.rondel.Rondel;\n" +
                 "\n" +
-                "@Mvp(\n" +
+                "@Rondel(\n" +
                 "        components = TestComponent.class,\n" +
                 "        modules = TestModule.class\n" +
                 ")\n" +
@@ -123,13 +123,13 @@ public class NestedViewInjectorTest {
 
         JavaFileObject viewFile = JavaFileObjects.forSourceString("test.ui.view.TestView", "package test.ui.view;\n" +
                 "\n" +
-                "import android.app.Activity;\n" +
+                "" +
                 "import android.content.Context;\n" +
                 "import android.util.AttributeSet;\n" +
                 "import android.view.View;\n" +
-                "import solar.blaz.rondel.Mvp;\n" +
+                "import solar.blaz.rondel.Rondel;\n" +
                 "\n" +
-                "@Mvp(\n" +
+                "@Rondel(\n" +
                 "        components = TestViewComponent.class,\n" +
                 "        modules = TestViewModule.class\n" +
                 ")\n" +
@@ -142,7 +142,7 @@ public class NestedViewInjectorTest {
         assertAbout(javaSources())
                 .that(ImmutableList.of(appFile, moduleFile, componentFile, activityFile, activityModuleFile,
                         activityComponentFile, viewModuleFile, viewComponentFile, viewFile))
-                .processedWith(new DaggerMVPProcessor(), new ComponentProcessor())
+                .processedWith(new RondelProcessor(), new ComponentProcessor())
                 .failsToCompile()
                 .withErrorContaining("View has to specify parent.");
 
@@ -210,9 +210,9 @@ public class NestedViewInjectorTest {
         JavaFileObject activityFile = JavaFileObjects.forSourceString("test.ui.TestActivity", "package test.ui;\n" +
                 "\n" +
                 "import android.app.Activity;\n" +
-                "import solar.blaz.rondel.Mvp;\n" +
+                "import solar.blaz.rondel.Rondel;\n" +
                 "\n" +
-                "@Mvp(\n" +
+                "@Rondel(\n" +
                 "        components = TestComponent.class,\n" +
                 "        modules = TestModule.class\n" +
                 ")\n" +
@@ -240,13 +240,13 @@ public class NestedViewInjectorTest {
 
         JavaFileObject viewFile = JavaFileObjects.forSourceString("test.ui.view.TestView", "package test.ui.view;\n" +
                 "\n" +
-                "import android.app.Activity;\n" +
+                "" +
                 "import android.content.Context;\n" +
                 "import android.util.AttributeSet;\n" +
                 "import android.view.View;\n" +
-                "import solar.blaz.rondel.Mvp;\n" +
+                "import solar.blaz.rondel.Rondel;\n" +
                 "\n" +
-                "@Mvp(\n" +
+                "@Rondel(\n" +
                 "        components = TestViewComponent.class,\n" +
                 "        modules = TestViewModule.class,\n" +
                 "        parent = test.ui.TestActivity.class\n" +
@@ -260,7 +260,7 @@ public class NestedViewInjectorTest {
         assertAbout(javaSources())
                 .that(ImmutableList.of(appFile, moduleFile, componentFile, activityFile, activityModuleFile,
                         activityComponentFile, viewModuleFile, viewComponentFile, viewFile))
-                .processedWith(new DaggerMVPProcessor(), new ComponentProcessor())
+                .processedWith(new RondelProcessor(), new ComponentProcessor())
                 .failsToCompile()
                 .withErrorContaining("Parent does not provide component.");
 
@@ -302,7 +302,7 @@ public class NestedViewInjectorTest {
                 "        modules = AppModule.class\n" +
                 ")\n" +
                 "public class TestApp extends Application implements AppComponentProvider {\n" +
-                "    public MVPTestAppComponent getComponent() {\n" +
+                "    public RondelTestAppComponent getComponent() {\n" +
                 "        return null;\n" +
                 "    }\n" +
                 "}");
@@ -330,9 +330,9 @@ public class NestedViewInjectorTest {
                 "import android.app.Activity;\n" +
                 "import solar.blaz.rondel.BaseComponent;\n" +
                 "import solar.blaz.rondel.ComponentProvider;\n" +
-                "import solar.blaz.rondel.Mvp;\n" +
+                "import solar.blaz.rondel.Rondel;\n" +
                 "\n" +
-                "@Mvp(\n" +
+                "@Rondel(\n" +
                 "        components = TestComponent.class,\n" +
                 "        modules = TestModule.class\n" +
                 ")\n" +
@@ -364,13 +364,13 @@ public class NestedViewInjectorTest {
 
         JavaFileObject viewFile = JavaFileObjects.forSourceString("test.ui.view.TestView", "package test.ui.view;\n" +
                 "\n" +
-                "import android.app.Activity;\n" +
+                "" +
                 "import android.content.Context;\n" +
                 "import android.util.AttributeSet;\n" +
                 "import android.view.View;\n" +
-                "import solar.blaz.rondel.Mvp;\n" +
+                "import solar.blaz.rondel.Rondel;\n" +
                 "\n" +
-                "@Mvp(\n" +
+                "@Rondel(\n" +
                 "        components = TestViewComponent.class,\n" +
                 "        modules = TestViewModule.class,\n" +
                 "        parent = test.ui.TestActivity.class\n" +
@@ -381,17 +381,17 @@ public class NestedViewInjectorTest {
                 "    }\n" +
                 "}");
 
-        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.ui.view.MVPTestView", "package test.ui.view;\n" +
+        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.ui.view.RondelTestView", "package test.ui.view;\n" +
                 "\n" +
-                "import test.ui.MVPTestActivityComponent;\n" +
+                "import test.ui.RondelTestActivityComponent;\n" +
                 "import test.ui.TestActivity;\n" +
                 "\n" +
-                "class MVPTestView {\n" +
+                "class RondelTestView {\n" +
                 "    \n" +
-                "    public static MVPTestViewComponent inject(TestView injectie) {\n" +
+                "    public static RondelTestViewComponent inject(TestView injectie) {\n" +
                 "        TestActivity activity = (TestActivity) injectie.getContext();\n" +
-                "        MVPTestActivityComponent baseComponent = (MVPTestActivityComponent) activity.getComponent();\n" +
-                "        MVPTestViewComponent component = baseComponent.mVPTestViewComponentBuilder()\n" +
+                "        RondelTestActivityComponent baseComponent = (RondelTestActivityComponent) activity.getComponent();\n" +
+                "        RondelTestViewComponent component = baseComponent.rondelTestViewComponentBuilder()\n" +
                 "                .build();\n" +
                 "        component.inject(injectie);\n" +
                 "        return component;\n" +
@@ -399,7 +399,7 @@ public class NestedViewInjectorTest {
                 "    \n" +
                 "}");
 
-        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.ui.view.MVPTestViewComponent", "package test.ui.view;\n" +
+        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.ui.view.RondelTestViewComponent", "package test.ui.view;\n" +
                 "\n" +
                 "import dagger.Subcomponent;\n" +
                 "import solar.blaz.rondel.BaseComponent;\n" +
@@ -409,14 +409,14 @@ public class NestedViewInjectorTest {
                 "        modules = { TestViewModule.class }\n" +
                 ")\n" +
                 "@ViewScope\n" +
-                "public interface MVPTestViewComponent extends BaseComponent, TestViewComponent {\n" +
+                "public interface RondelTestViewComponent extends BaseComponent, TestViewComponent {\n" +
                 "    \n" +
                 "    void inject(TestView view);\n" +
                 "    \n" +
                 "    @Subcomponent.Builder\n" +
                 "    interface Builder {\n" +
                 "        Builder testViewModule(TestViewModule module);\n" +
-                "        MVPTestViewComponent build();\n" +
+                "        RondelTestViewComponent build();\n" +
                 "    }\n" +
                 "    \n" +
                 "}");
@@ -424,7 +424,7 @@ public class NestedViewInjectorTest {
         assertAbout(javaSources())
                 .that(ImmutableList.of(appFile, moduleFile, componentFile, activityFile, activityModuleFile,
                         activityComponentFile, viewModuleFile, viewComponentFile, viewFile))
-                .processedWith(new DaggerMVPProcessor(), new ComponentProcessor())
+                .processedWith(new RondelProcessor(), new ComponentProcessor())
                 .compilesWithoutError()
                 .and()
                 .generatesSources(expectedInjector, expectedComponent);

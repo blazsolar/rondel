@@ -16,17 +16,14 @@
 
 package solar.blaz.rondel.compiler;
 
-import dagger.Component;
-
-import javax.inject.Singleton;
-
 /**
- * Created by blazsolar on 05/03/16.
+ * Created by blaz on 24/05/16.
  */
-@Component(
-        modules = CompilerModule.class
-)
-@Singleton
-public interface CompilerComponent {
-    void inject(RondelProcessor processor);
+public final class Constants {
+
+    public static final String CLASS_PREFIX = "Rondel";
+
+    private Constants() {
+        // no instanes
+    }
 }

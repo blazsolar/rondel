@@ -19,7 +19,7 @@ package solar.blaz.rondel.compiler;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.LinkedListMultimap;
 import solar.blaz.rondel.App;
-import solar.blaz.rondel.Mvp;
+import solar.blaz.rondel.Rondel;
 import solar.blaz.rondel.compiler.manager.Messager;
 import solar.blaz.rondel.compiler.manager.SingletonInjectorManager;
 import solar.blaz.rondel.compiler.manager.ViewInjectorManager;
@@ -41,7 +41,7 @@ import java.util.Set;
 /**
  * Created by blazsolar on 24/02/16.
  */
-public class DaggerMVPProcessor extends AbstractProcessor {
+public class RondelProcessor extends AbstractProcessor {
 
     @Inject SingletonInjectorManager singletonInjectorManager;
     @Inject ViewInjectorManager viewInjectorManager;
@@ -74,7 +74,7 @@ public class DaggerMVPProcessor extends AbstractProcessor {
 
             ComponentModel appComponent = singletonInjectorManager.getComponent();
 
-            Set<? extends Element> elements = env.getElementsAnnotatedWith(Mvp.class);
+            Set<? extends Element> elements = env.getElementsAnnotatedWith(Rondel.class);
 
             for (Element element : elements) {
 
@@ -118,7 +118,7 @@ public class DaggerMVPProcessor extends AbstractProcessor {
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
-        return ImmutableSet.of(Mvp.class.getName(), App.class.getName());
+        return ImmutableSet.of(Rondel.class.getName(), App.class.getName());
     }
 
     private List<ComponentModel> generateFiles(ComponentModel parent) throws IOException {

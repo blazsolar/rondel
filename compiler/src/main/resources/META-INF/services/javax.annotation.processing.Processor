@@ -14,4 +14,4 @@
 #    limitations under the License.
 #
 
-solar.blaz.rondel.compiler.DaggerMVPProcessor
+solar.blaz.rondel.compiler.RondelProcessor

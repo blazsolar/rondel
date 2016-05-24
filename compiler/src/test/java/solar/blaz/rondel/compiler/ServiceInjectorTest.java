@@ -67,7 +67,7 @@ public class ServiceInjectorTest {
                 "        modules = AppModule.class\n" +
                 ")\n" +
                 "public class TestApp extends Application implements AppComponentProvider {\n" +
-                "    public MVPTestAppComponent getComponent() {\n" +
+                "    public RondelTestAppComponent getComponent() {\n" +
                 "        return null;\n" +
                 "    }\n" +
                 "}");
@@ -95,9 +95,9 @@ public class ServiceInjectorTest {
                 "import android.app.Service;\n" +
                 "import android.content.Intent;\n" +
                 "import android.os.IBinder;\n" +
-                "import solar.blaz.rondel.Mvp;\n" +
+                "import solar.blaz.rondel.Rondel;\n" +
                 "\n" +
-                "@Mvp(\n" +
+                "@Rondel(\n" +
                 "        components = TestComponent.class,\n" +
                 "        modules = TestModule.class\n" +
                 ")\n" +
@@ -109,17 +109,17 @@ public class ServiceInjectorTest {
                 "    }\n" +
                 "}");
 
-        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.service.MVPTestService", "package test.service;\n" +
+        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.service.RondelTestService", "package test.service;\n" +
                 "\n" +
-                "import test.MVPTestAppComponent;\n" +
+                "import test.RondelTestAppComponent;\n" +
                 "import test.TestApp;\n" +
                 "\n" +
-                "class MVPTestService {\n" +
+                "class RondelTestService {\n" +
                 "    \n" +
-                "    public static MVPTestServiceComponent inject(TestService injectie) {\n" +
+                "    public static RondelTestServiceComponent inject(TestService injectie) {\n" +
                 "        TestApp app = (TestApp) injectie.getApplicationContext();\n" +
-                "        MVPTestAppComponent baseComponent = (MVPTestAppComponent) app.getComponent();\n" +
-                "        MVPTestServiceComponent component = baseComponent.mVPTestServiceComponentBuilder()\n" +
+                "        RondelTestAppComponent baseComponent = (RondelTestAppComponent) app.getComponent();\n" +
+                "        RondelTestServiceComponent component = baseComponent.rondelTestServiceComponentBuilder()\n" +
                 "                .build();\n" +
                 "        component.inject(injectie);\n" +
                 "        return component;\n" +
@@ -127,7 +127,7 @@ public class ServiceInjectorTest {
                 "    \n" +
                 "}");
 
-        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.service.MVPTestServiceComponent", "package test.service;\n" +
+        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.service.RondelTestServiceComponent", "package test.service;\n" +
                 "\n" +
                 "import dagger.Subcomponent;\n" +
                 "import solar.blaz.rondel.BaseComponent;\n" +
@@ -137,21 +137,21 @@ public class ServiceInjectorTest {
                 "        modules = { TestModule.class }\n" +
                 ")\n" +
                 "@ViewScope\n" +
-                "public interface MVPTestServiceComponent extends BaseComponent, TestComponent {\n" +
+                "public interface RondelTestServiceComponent extends BaseComponent, TestComponent {\n" +
                 "    \n" +
                 "    void inject(TestService view);\n" +
                 "\n" +
                 "    @Subcomponent.Builder\n" +
                 "    interface Builder {\n" +
                 "        Builder testModule(TestModule module);\n" +
-                "        MVPTestServiceComponent build();\n" +
+                "        RondelTestServiceComponent build();\n" +
                 "    }\n" +
                 "    \n" +
                 "}");
 
         assertAbout(javaSources())
                 .that(ImmutableList.of(appFile, moduleFile, componentFile, activityFile, activityModuleFile, activityComponentFile))
-                .processedWith(new DaggerMVPProcessor(), new ComponentProcessor())
+                .processedWith(new RondelProcessor(), new ComponentProcessor())
                 .compilesWithoutError()
                 .and()
                 .generatesSources(expectedInjector, expectedComponent);

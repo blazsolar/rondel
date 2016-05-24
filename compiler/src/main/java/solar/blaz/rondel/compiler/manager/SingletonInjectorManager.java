@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import com.squareup.javapoet.*;
 import solar.blaz.rondel.App;
 import solar.blaz.rondel.BaseAppComponent;
+import solar.blaz.rondel.compiler.Constants;
 import solar.blaz.rondel.compiler.model.ComponentModel;
 import solar.blaz.rondel.compiler.model.InjectorModel;
 
@@ -76,14 +77,14 @@ public class SingletonInjectorManager extends AbstractInjectorManager {
 
                         if (modleElements != null) {
                             ComponentModel componentModel = new ComponentModel(app);
-                            componentModel.name = "MVP" + app.getSimpleName() + "Component";
+                            componentModel.name = Constants.CLASS_PREFIX + app.getSimpleName() + "Component";
                             componentModel.packageName = elementUtils.getPackageOf(app).getQualifiedName().toString();
                             componentModel.view = app.asType();
                             componentModel.modules = modleElements;
                             componentModel.components = componentElements;
 
                             InjectorModel injectorModel = new InjectorModel(app);
-                            injectorModel.name = "MVP" + app.getSimpleName();
+                            injectorModel.name = Constants.CLASS_PREFIX + app.getSimpleName();
                             injectorModel.packageName = elementUtils.getPackageOf(app).getQualifiedName().toString();
                             injectorModel.view = app.asType();
 

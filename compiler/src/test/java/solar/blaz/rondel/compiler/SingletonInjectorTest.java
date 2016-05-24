@@ -43,16 +43,16 @@ public class SingletonInjectorTest {
         JavaFileObject mvpFile = JavaFileObjects.forSourceString("test.SampleActivity", "package test;\n" +
                 "\n" +
                 "import android.app.Activity;\n" +
-                "import solar.blaz.rondel.Mvp;\n" +
+                "import solar.blaz.rondel.Rondel;\n" +
                 "\n" +
-                "@Mvp\n" +
+                "@Rondel\n" +
                 "public class SampleActivity extends Activity {\n" +
                 "    \n" +
                 "}");
 
         assertAbout(javaSources())
                 .that(ImmutableList.of(appFile, mvpFile))
-                .processedWith(new DaggerMVPProcessor())
+                .processedWith(new RondelProcessor())
                 .failsToCompile()
                 .withErrorContaining("No App level view provided.");
 
@@ -77,7 +77,7 @@ public class SingletonInjectorTest {
 
         assertAbout(javaSources())
                 .that(ImmutableList.of(appFile, app2File))
-                .processedWith(new DaggerMVPProcessor())
+                .processedWith(new RondelProcessor())
                 .failsToCompile()
                 .withErrorContaining("Only one App level view is allowed.");
 
@@ -104,7 +104,7 @@ public class SingletonInjectorTest {
                 "    \n" +
                 "}");
 
-        JavaFileObject componentFile = JavaFileObjects.forSourceString("test.MVPAppComponent", "package test;\n" +
+        JavaFileObject componentFile = JavaFileObjects.forSourceString("test.RondelAppComponent", "package test;\n" +
                 "\n" +
                 "import dagger.Component;\n" +
                 "import javax.inject.Singleton;\n" +
@@ -114,13 +114,13 @@ public class SingletonInjectorTest {
                 "        modules = { AppModule.class }\n" +
                 ")\n" +
                 "@Singleton\n" +
-                "public interface MVPAppComponent extends BaseAppComponent {\n" +
+                "public interface RondelAppComponent extends BaseAppComponent {\n" +
                 "    void inject(App app);\n" +
                 "}");
 
         assertAbout(javaSources())
                 .that(ImmutableList.of(appFile, moduleFile))
-                .processedWith(new DaggerMVPProcessor(), new ComponentProcessor())
+                .processedWith(new RondelProcessor(), new ComponentProcessor())
                 .compilesWithoutError()
                 .and()
                 .generatesSources(componentFile);
@@ -157,7 +157,7 @@ public class SingletonInjectorTest {
 
         assertAbout(javaSources())
                 .that(ImmutableList.of(appFile, moduleFile, componentFile))
-                .processedWith(new DaggerMVPProcessor())
+                .processedWith(new RondelProcessor())
                 .failsToCompile()
                 .withErrorContaining("Component has to be interface.");
 
@@ -183,7 +183,7 @@ public class SingletonInjectorTest {
 
         assertAbout(javaSources())
                 .that(ImmutableList.of(appFile, componentFile))
-                .processedWith(new DaggerMVPProcessor())
+                .processedWith(new RondelProcessor())
                 .failsToCompile()
                 .withErrorContaining("App module was not provided.");
 
@@ -216,7 +216,7 @@ public class SingletonInjectorTest {
 
         assertAbout(javaSources())
                 .that(ImmutableList.of(appFile, moduleFile, componentFile))
-                .processedWith(new DaggerMVPProcessor())
+                .processedWith(new RondelProcessor())
                 .failsToCompile()
                 .withErrorContaining("App module is missing @Module annotation.");
 
@@ -254,18 +254,18 @@ public class SingletonInjectorTest {
                 "    \n" +
                 "}");
 
-        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.MVPApp", "package test;\n" +
+        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.RondelApp", "package test;\n" +
                 "\n" +
-                "public class MVPApp {\n" +
-                "    public static MVPAppComponent inject(App injectie) {\n" +
-                "        MVPAppComponent component = DaggerMVPAppComponent.builder()\n" +
+                "public class RondelApp {\n" +
+                "    public static RondelAppComponent inject(App injectie) {\n" +
+                "        RondelAppComponent component = DaggerRondelAppComponent.builder()\n" +
                 "                .appModule(new AppModule(injectie))\n" +
                 "                .build();\n" +
                 "        component.inject(injectie);\n" +
                 "        return component;}\n" +
                 "}");
 
-        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.MVPAppComponent", "package test;\n" +
+        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.RondelAppComponent", "package test;\n" +
                 "\n" +
                 "import dagger.Component;\n" +
                 "import javax.inject.Singleton;\n" +
@@ -275,13 +275,13 @@ public class SingletonInjectorTest {
                 "        modules = { AppModule.class }\n" +
                 ")\n" +
                 "@Singleton\n" +
-                "public interface MVPAppComponent extends BaseAppComponent, AppComponent {\n" +
+                "public interface RondelAppComponent extends BaseAppComponent, AppComponent {\n" +
                 "    void inject(App app);\n" +
                 "}");
 
         assertAbout(javaSources())
                 .that(ImmutableList.of(appFile, moduleFile, componentFile))
-                .processedWith(new DaggerMVPProcessor(), new ComponentProcessor())
+                .processedWith(new RondelProcessor(), new ComponentProcessor())
                 .compilesWithoutError()
                 .and()
                 .generatesSources(expectedInjector, expectedComponent);
@@ -322,18 +322,18 @@ public class SingletonInjectorTest {
                 "    \n" +
                 "}");
 
-        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.MVPTestApp", "package test;\n" +
+        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.RondelTestApp", "package test;\n" +
                 "\n" +
-                "public class MVPTestApp {\n" +
-                "    public static MVPTestAppComponent inject(TestApp injectie) {\n" +
-                "        MVPTestAppComponent component = DaggerMVPTestAppComponent.builder()\n" +
+                "public class RondelTestApp {\n" +
+                "    public static RondelTestAppComponent inject(TestApp injectie) {\n" +
+                "        RondelTestAppComponent component = DaggerRondelTestAppComponent.builder()\n" +
                 "                .testAppModule(new TestAppModule(injectie))\n" +
                 "                .build();\n" +
                 "        component.inject(injectie);\n" +
                 "        return component;}\n" +
                 "}");
 
-        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.MVPTestAppComponent", "package test;\n" +
+        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.RondelTestAppComponent", "package test;\n" +
                 "\n" +
                 "import dagger.Component;\n" +
                 "import javax.inject.Singleton;\n" +
@@ -343,13 +343,13 @@ public class SingletonInjectorTest {
                 "        modules = { TestAppModule.class }\n" +
                 ")\n" +
                 "@Singleton\n" +
-                "public interface MVPTestAppComponent extends BaseAppComponent, TestAppComponent {\n" +
+                "public interface RondelTestAppComponent extends BaseAppComponent, TestAppComponent {\n" +
                 "    void inject(TestApp app);\n" +
                 "}");
 
         assertAbout(javaSources())
                 .that(ImmutableList.of(appFile, moduleFile, componentFile))
-                .processedWith(new DaggerMVPProcessor(), new ComponentProcessor())
+                .processedWith(new RondelProcessor(), new ComponentProcessor())
                 .compilesWithoutError()
                 .and()
                 .generatesSources(expectedInjector, expectedComponent);
@@ -386,17 +386,17 @@ public class SingletonInjectorTest {
                 "    \n" +
                 "}");
 
-        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.MVPTestApp", "package test;\n" +
+        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.RondelTestApp", "package test;\n" +
                 "\n" +
-                "public class MVPTestApp {\n" +
-                "    public static MVPTestAppComponent inject(TestApp injectie) {\n" +
-                "        MVPTestAppComponent component = DaggerMVPTestAppComponent.builder()\n" +
+                "public class RondelTestApp {\n" +
+                "    public static RondelTestAppComponent inject(TestApp injectie) {\n" +
+                "        RondelTestAppComponent component = DaggerRondelTestAppComponent.builder()\n" +
                 "                .build();\n" +
                 "        component.inject(injectie);\n" +
                 "        return component;}\n" +
                 "}");
 
-        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.MVPTestAppComponent", "package test;\n" +
+        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.RondelTestAppComponent", "package test;\n" +
                 "\n" +
                 "import dagger.Component;\n" +
                 "import javax.inject.Singleton;\n" +
@@ -406,13 +406,13 @@ public class SingletonInjectorTest {
                 "        modules = { TestAppModule.class }\n" +
                 ")\n" +
                 "@Singleton\n" +
-                "public interface MVPTestAppComponent extends BaseAppComponent, TestAppComponent {\n" +
+                "public interface RondelTestAppComponent extends BaseAppComponent, TestAppComponent {\n" +
                 "    void inject(TestApp app);\n" +
                 "}");
 
         assertAbout(javaSources())
                 .that(ImmutableList.of(appFile, moduleFile, componentFile))
-                .processedWith(new DaggerMVPProcessor(), new ComponentProcessor())
+                .processedWith(new RondelProcessor(), new ComponentProcessor())
                 .compilesWithoutError()
                 .and()
                 .generatesSources(expectedInjector, expectedComponent);
@@ -453,7 +453,7 @@ public class SingletonInjectorTest {
 
         assertAbout(javaSources())
                 .that(ImmutableList.of(appFile, moduleFile, componentFile))
-                .processedWith(new DaggerMVPProcessor(), new ComponentProcessor())
+                .processedWith(new RondelProcessor(), new ComponentProcessor())
                 .failsToCompile()
                 .withErrorContaining("No valid constructor for module.");
 
@@ -497,18 +497,18 @@ public class SingletonInjectorTest {
                 "    \n" +
                 "}");
 
-        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.MVPTestApp", "package test;\n" +
+        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.RondelTestApp", "package test;\n" +
                 "\n" +
-                "public class MVPTestApp {\n" +
-                "    public static MVPTestAppComponent inject(TestApp injectie) {\n" +
-                "        MVPTestAppComponent component = DaggerMVPTestAppComponent.builder()\n" +
+                "public class RondelTestApp {\n" +
+                "    public static RondelTestAppComponent inject(TestApp injectie) {\n" +
+                "        RondelTestAppComponent component = DaggerRondelTestAppComponent.builder()\n" +
                 "                .testAppModule(new TestAppModule(injectie))\n" +
                 "                .build();\n" +
                 "        component.inject(injectie);\n" +
                 "        return component;}\n" +
                 "}");
 
-        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.MVPTestAppComponent", "package test;\n" +
+        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.RondelTestAppComponent", "package test;\n" +
                 "\n" +
                 "import dagger.Component;\n" +
                 "import javax.inject.Singleton;\n" +
@@ -518,13 +518,13 @@ public class SingletonInjectorTest {
                 "        modules = { TestAppModule.class }\n" +
                 ")\n" +
                 "@Singleton\n" +
-                "public interface MVPTestAppComponent extends BaseAppComponent, TestAppComponent {\n" +
+                "public interface RondelTestAppComponent extends BaseAppComponent, TestAppComponent {\n" +
                 "    void inject(TestApp app);\n" +
                 "}");
 
         assertAbout(javaSources())
                 .that(ImmutableList.of(appFile, moduleFile, componentFile, baseAppFile))
-                .processedWith(new DaggerMVPProcessor(), new ComponentProcessor())
+                .processedWith(new RondelProcessor(), new ComponentProcessor())
                 .compilesWithoutError()
                 .and()
                 .generatesSources(expectedInjector, expectedComponent);
@@ -571,7 +571,7 @@ public class SingletonInjectorTest {
 
         assertAbout(javaSources())
                 .that(ImmutableList.of(appFile, moduleFile, componentFile, baseAppFile))
-                .processedWith(new DaggerMVPProcessor(), new ComponentProcessor())
+                .processedWith(new RondelProcessor(), new ComponentProcessor())
                 .failsToCompile()
                 .withErrorContaining("No valid constructor for module.");
 
@@ -628,11 +628,11 @@ public class SingletonInjectorTest {
                 "    \n" +
                 "}");
 
-        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.MVPTestApp", "package test;\n" +
+        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.RondelTestApp", "package test;\n" +
                 "\n" +
-                "public class MVPTestApp {\n" +
-                "    public static MVPTestAppComponent inject(TestApp injectie) {\n" +
-                "        MVPTestAppComponent component = DaggerMVPTestAppComponent.builder()\n" +
+                "public class RondelTestApp {\n" +
+                "    public static RondelTestAppComponent inject(TestApp injectie) {\n" +
+                "        RondelTestAppComponent component = DaggerRondelTestAppComponent.builder()\n" +
                 "                .testAppModule(new TestAppModule(injectie))\n" +
                 "                .testAppModule2(new TestAppModule2(injectie))\n" +
                 "                .build();\n" +
@@ -640,7 +640,7 @@ public class SingletonInjectorTest {
                 "        return component;}\n" +
                 "}");
 
-        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.MVPTestAppComponent", "package test;\n" +
+        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.RondelTestAppComponent", "package test;\n" +
                 "\n" +
                 "import dagger.Component;\n" +
                 "import javax.inject.Singleton;\n" +
@@ -650,13 +650,13 @@ public class SingletonInjectorTest {
                 "        modules = { TestAppModule.class, TestAppModule2.class }\n" +
                 ")\n" +
                 "@Singleton\n" +
-                "public interface MVPTestAppComponent extends BaseAppComponent, TestAppComponent {\n" +
+                "public interface RondelTestAppComponent extends BaseAppComponent, TestAppComponent {\n" +
                 "    void inject(TestApp app);\n" +
                 "}");
 
         assertAbout(javaSources())
                 .that(ImmutableList.of(appFile, moduleFile, moduleFile2, componentFile))
-                .processedWith(new DaggerMVPProcessor(), new ComponentProcessor())
+                .processedWith(new RondelProcessor(), new ComponentProcessor())
                 .compilesWithoutError()
                 .and()
                 .generatesSources(expectedInjector, expectedComponent);
@@ -700,18 +700,18 @@ public class SingletonInjectorTest {
                 "    \n" +
                 "}");
 
-        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.MVPTest3App", "package test;\n" +
+        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.RondelTest3App", "package test;\n" +
                 "\n" +
-                "public class MVPTest3App {\n" +
-                "    public static MVPTest3AppComponent inject(Test3App injectie) {\n" +
-                "        MVPTest3AppComponent component = DaggerMVPTest3AppComponent.builder()\n" +
+                "public class RondelTest3App {\n" +
+                "    public static RondelTest3AppComponent inject(Test3App injectie) {\n" +
+                "        RondelTest3AppComponent component = DaggerRondelTest3AppComponent.builder()\n" +
                 "                .test1AppModule(new Test1AppModule(injectie))\n" +
                 "                .build();\n" +
                 "        component.inject(injectie);\n" +
                 "        return component;}\n" +
                 "}");
 
-        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.MVPTest3AppComponent", "package test;\n" +
+        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.RondelTest3AppComponent", "package test;\n" +
                 "\n" +
                 "import dagger.Component;\n" +
                 "import javax.inject.Singleton;\n" +
@@ -721,13 +721,13 @@ public class SingletonInjectorTest {
                 "        modules = { Test1AppModule.class }\n" +
                 ")\n" +
                 "@Singleton\n" +
-                "public interface MVPTest3AppComponent extends BaseAppComponent, Test2AppComponent {\n" +
+                "public interface RondelTest3AppComponent extends BaseAppComponent, Test2AppComponent {\n" +
                 "    void inject(Test3App app);\n" +
                 "}");
 
         assertAbout(javaSources())
                 .that(ImmutableList.of(appFile, moduleFile, componentFile))
-                .processedWith(new DaggerMVPProcessor(), new ComponentProcessor())
+                .processedWith(new RondelProcessor(), new ComponentProcessor())
                 .compilesWithoutError()
                 .and()
                 .generatesSources(expectedInjector, expectedComponent);
@@ -768,20 +768,20 @@ public class SingletonInjectorTest {
                 "    \n" +
                 "}");
 
-        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.app.MVPApp", "package test.app;\n" +
+        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.app.RondelApp", "package test.app;\n" +
                 "\n" +
                 "import test.module.AppModule;\n" +
                 "\n" +
-                "public class MVPApp {\n" +
-                "    public static MVPAppComponent inject(App injectie) {\n" +
-                "        MVPAppComponent component = DaggerMVPAppComponent.builder()\n" +
+                "public class RondelApp {\n" +
+                "    public static RondelAppComponent inject(App injectie) {\n" +
+                "        RondelAppComponent component = DaggerRondelAppComponent.builder()\n" +
                 "                .appModule(new AppModule(injectie))\n" +
                 "                .build();\n" +
                 "        component.inject(injectie);\n" +
                 "        return component;}\n" +
                 "}");
 
-        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.app.MVPAppComponent", "package test.app;\n" +
+        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.app.RondelAppComponent", "package test.app;\n" +
                 "\n" +
                 "import dagger.Component;\n" +
                 "import javax.inject.Singleton;\n" +
@@ -793,13 +793,13 @@ public class SingletonInjectorTest {
                 "        modules = { AppModule.class }\n" +
                 ")\n" +
                 "@Singleton\n" +
-                "public interface MVPAppComponent extends BaseAppComponent, AppComponent {\n" +
+                "public interface RondelAppComponent extends BaseAppComponent, AppComponent {\n" +
                 "    void inject(App app);\n" +
                 "}");
 
         assertAbout(javaSources())
                 .that(ImmutableList.of(appFile, moduleFile, componentFile))
-                .processedWith(new DaggerMVPProcessor(), new ComponentProcessor())
+                .processedWith(new RondelProcessor(), new ComponentProcessor())
                 .compilesWithoutError()
                 .and()
                 .generatesSources(expectedInjector, expectedComponent);
