@@ -94,12 +94,20 @@ test {
     }
 }
 
+def mavenRepoUrl
+if (isReleaseBuild()) {
+    println 'RELEASE BUILD'
+    mavenRepoUrl = "s3://kamino-maven.s3.eu-central-1.amazonaws.com/lib-release"
+} else {
+    println 'DEBUG BUILD'
+    mavenRepoUrl = "s3://kamino-maven.s3.eu-central-1.amazonaws.com/lib-snapshot"
+}
 
 
 publishing {
     repositories {
         maven {
-            url "s3://kamino-maven.s3.eu-central-1.amazonaws.com/lib-snapshot"
+            url mavenRepoUrl
             credentials(AwsCredentials) {
                 accessKey kaminoMavenAccessKey
                 secretKey kaminoMavenSecretKey
