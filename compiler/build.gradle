@@ -55,8 +55,8 @@ dependencies {
     compile 'com.google.guava:guava:19.0'
     compile 'com.google.auto:auto-common:0.6'
 
-    compileOnly'com.google.android:android:4.1.1.4'
-    
+    compileOnly 'com.google.android:android:4.1.1.4'
+
     apt 'com.google.dagger:dagger-compiler:2.1'
 
     testCompile 'junit:junit:4.11'
@@ -64,6 +64,7 @@ dependencies {
     testCompile 'com.google.testing.compile:compile-testing:0.8'
     testCompile files(org.gradle.internal.jvm.Jvm.current().getToolsJar())
     testCompile 'com.google.dagger:dagger-compiler:2.1'
+    testCompile 'com.google.android:android:4.1.1.4'
 }
 
 jacocoTestReport {

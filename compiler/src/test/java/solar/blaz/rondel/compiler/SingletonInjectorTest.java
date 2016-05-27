@@ -257,12 +257,28 @@ public class SingletonInjectorTest {
         JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.RondelApp", "package test;\n" +
                 "\n" +
                 "public class RondelApp {\n" +
+                "    \n" +
+                "    private static AppModule appModule;\n" +
+                "    \n" +
                 "    public static RondelAppComponent inject(App injectie) {\n" +
                 "        RondelAppComponent component = DaggerRondelAppComponent.builder()\n" +
-                "                .appModule(new AppModule(injectie))\n" +
+                "                .appModule(getAppModule(injectie))\n" +
                 "                .build();\n" +
                 "        component.inject(injectie);\n" +
-                "        return component;}\n" +
+                "        return component;\n" +
+                "    }\n" +
+                "\n" +
+                "    public static void setAppModule(AppModule module) {\n" +
+                "        appModule = module;\n" +
+                "    }\n" +
+                "    \n" +
+                "    private static AppModule getAppModule(App injectie) {\n" +
+                "        if (appModule != null) {\n" +
+                "            return appModule;\n" +
+                "        } else {\n" +
+                "            return new AppModule(injectie);\n" +
+                "        }\n" +
+                "    }\n" +
                 "}");
 
         JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.RondelAppComponent", "package test;\n" +
@@ -325,12 +341,29 @@ public class SingletonInjectorTest {
         JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.RondelTestApp", "package test;\n" +
                 "\n" +
                 "public class RondelTestApp {\n" +
+                "    \n" +
+                "    private static TestAppModule testAppModule;\n" +
+                "    \n" +
                 "    public static RondelTestAppComponent inject(TestApp injectie) {\n" +
                 "        RondelTestAppComponent component = DaggerRondelTestAppComponent.builder()\n" +
-                "                .testAppModule(new TestAppModule(injectie))\n" +
+                "                .testAppModule(getTestAppModule(injectie))\n" +
                 "                .build();\n" +
                 "        component.inject(injectie);\n" +
-                "        return component;}\n" +
+                "        return component;\n" +
+                "    }\n" +
+                "    \n" +
+                "    public static void setTestAppModule(TestAppModule module) {\n" +
+                "        testAppModule = module;\n" +
+                "    }\n" +
+                "    \n" +
+                "    private static TestAppModule getTestAppModule(TestApp injectie) {\n" +
+                "        if (testAppModule != null) {\n" +
+                "            return testAppModule;\n" +
+                "        } else {\n" +
+                "            return new TestAppModule(injectie);\n" +
+                "        }\n" +
+                "    }\n" +
+                "    \n" +
                 "}");
 
         JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.RondelTestAppComponent", "package test;\n" +
@@ -389,11 +422,29 @@ public class SingletonInjectorTest {
         JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.RondelTestApp", "package test;\n" +
                 "\n" +
                 "public class RondelTestApp {\n" +
+                "    \n" +
+                "    private static TestAppModule testAppModule;\n" +
+                "    \n" +
                 "    public static RondelTestAppComponent inject(TestApp injectie) {\n" +
                 "        RondelTestAppComponent component = DaggerRondelTestAppComponent.builder()\n" +
+                "                .testAppModule(getTestAppModule(injectie))\n" +
                 "                .build();\n" +
                 "        component.inject(injectie);\n" +
-                "        return component;}\n" +
+                "        return component;\n" +
+                "    }\n" +
+                "    \n" +
+                "    public static void setTestAppModule(TestAppModule module) {\n" +
+                "        testAppModule = module;\n" +
+                "    }\n" +
+                "    \n" +
+                "    private static TestAppModule getTestAppModule(TestApp injectie) {\n" +
+                "        if (testAppModule != null) {\n" +
+                "            return testAppModule;\n" +
+                "        } else {\n" +
+                "            return new TestAppModule();\n" +
+                "        }\n" +
+                "    }\n" +
+                "    \n" +
                 "}");
 
         JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.RondelTestAppComponent", "package test;\n" +
@@ -500,12 +551,28 @@ public class SingletonInjectorTest {
         JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.RondelTestApp", "package test;\n" +
                 "\n" +
                 "public class RondelTestApp {\n" +
+                "    \n" +
+                "    private static TestAppModule testAppModule;\n" +
+                "    \n" +
                 "    public static RondelTestAppComponent inject(TestApp injectie) {\n" +
                 "        RondelTestAppComponent component = DaggerRondelTestAppComponent.builder()\n" +
-                "                .testAppModule(new TestAppModule(injectie))\n" +
+                "                .testAppModule(getTestAppModule(injectie))\n" +
                 "                .build();\n" +
                 "        component.inject(injectie);\n" +
-                "        return component;}\n" +
+                "        return component;\n" +
+                "    }\n" +
+                "    \n" +
+                "    public static void setTestAppModule(TestAppModule module) {\n" +
+                "        testAppModule = module;\n" +
+                "    }\n" +
+                "    \n" +
+                "    private static TestAppModule getTestAppModule(TestApp injectie) {\n" +
+                "        if (testAppModule != null) {\n" +
+                "            return testAppModule;\n" +
+                "        } else {\n" +
+                "            return new TestAppModule(injectie);\n" +
+                "        }\n" +
+                "    }\n" +
                 "}");
 
         JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.RondelTestAppComponent", "package test;\n" +
@@ -631,13 +698,42 @@ public class SingletonInjectorTest {
         JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.RondelTestApp", "package test;\n" +
                 "\n" +
                 "public class RondelTestApp {\n" +
+                "    \n" +
+                "    private static TestAppModule testAppModule;\n" +
+                "    private static TestAppModule2 testAppModule2;\n" +
+                "    \n" +
                 "    public static RondelTestAppComponent inject(TestApp injectie) {\n" +
                 "        RondelTestAppComponent component = DaggerRondelTestAppComponent.builder()\n" +
-                "                .testAppModule(new TestAppModule(injectie))\n" +
-                "                .testAppModule2(new TestAppModule2(injectie))\n" +
+                "                .testAppModule(getTestAppModule(injectie))\n" +
+                "                .testAppModule2(getTestAppModule2(injectie))\n" +
                 "                .build();\n" +
                 "        component.inject(injectie);\n" +
-                "        return component;}\n" +
+                "        return component;\n" +
+                "    }\n" +
+                "    \n" +
+                "    public static void setTestAppModule(TestAppModule module) {\n" +
+                "        testAppModule = module;\n" +
+                "    }\n" +
+                "    \n" +
+                "    private static TestAppModule getTestAppModule(TestApp injectie) {\n" +
+                "        if (testAppModule != null) {\n" +
+                "            return testAppModule;\n" +
+                "        } else {\n" +
+                "            return new TestAppModule(injectie);\n" +
+                "        }\n" +
+                "    }\n" +
+                "    \n" +
+                "    public static void setTestAppModule2(TestAppModule2 module) {\n" +
+                "        testAppModule2 = module;\n" +
+                "    }\n" +
+                "    \n" +
+                "    private static TestAppModule2 getTestAppModule2(TestApp injectie) {\n" +
+                "        if (testAppModule2 != null) {\n" +
+                "            return testAppModule2;\n" +
+                "        } else {\n" +
+                "            return new TestAppModule2(injectie);    \n" +
+                "        }\n" +
+                "    }\n" +
                 "}");
 
         JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.RondelTestAppComponent", "package test;\n" +
@@ -703,12 +799,29 @@ public class SingletonInjectorTest {
         JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.RondelTest3App", "package test;\n" +
                 "\n" +
                 "public class RondelTest3App {\n" +
+                "    \n" +
+                "    private static Test1AppModule test1AppModule;\n" +
+                "    \n" +
                 "    public static RondelTest3AppComponent inject(Test3App injectie) {\n" +
                 "        RondelTest3AppComponent component = DaggerRondelTest3AppComponent.builder()\n" +
-                "                .test1AppModule(new Test1AppModule(injectie))\n" +
+                "                .test1AppModule(getTest1AppModule(injectie))\n" +
                 "                .build();\n" +
                 "        component.inject(injectie);\n" +
-                "        return component;}\n" +
+                "        return component;\n" +
+                "    }\n" +
+                "    \n" +
+                "    public static void setTest1AppModule(Test1AppModule module) {\n" +
+                "        test1AppModule = module;\n" +
+                "    }\n" +
+                "    \n" +
+                "    private static Test1AppModule getTest1AppModule(Test3App injectie) {\n" +
+                "        if (test1AppModule != null) {\n" +
+                "            return test1AppModule;\n" +
+                "        } else {\n" +
+                "            return new Test1AppModule(injectie);\n" +
+                "        }\n" +
+                "    }\n" +
+                "    \n" +
                 "}");
 
         JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.RondelTest3AppComponent", "package test;\n" +
@@ -773,12 +886,28 @@ public class SingletonInjectorTest {
                 "import test.module.AppModule;\n" +
                 "\n" +
                 "public class RondelApp {\n" +
+                "    \n" +
+                "    private static AppModule appModule;\n" +
+                "    \n" +
                 "    public static RondelAppComponent inject(App injectie) {\n" +
                 "        RondelAppComponent component = DaggerRondelAppComponent.builder()\n" +
-                "                .appModule(new AppModule(injectie))\n" +
+                "                .appModule(getAppModule(injectie))\n" +
                 "                .build();\n" +
                 "        component.inject(injectie);\n" +
-                "        return component;}\n" +
+                "        return component;\n" +
+                "    }\n" +
+                "    \n" +
+                "    public static void setAppModule(AppModule module) {\n" +
+                "        appModule = module;\n" +
+                "    }\n" +
+                "    \n" +
+                "    private static AppModule getAppModule(App injectie) {\n" +
+                "        if (appModule != null) {\n" +
+                "            return appModule;\n" +
+                "        } else {\n" +
+                "            return new AppModule(injectie);\n" +
+                "        }\n" +
+                "    }\n" +
                 "}");
 
         JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.app.RondelAppComponent", "package test.app;\n" +

@@ -20,9 +20,7 @@ import android.view.View;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.*;
 import dagger.Module;
 import solar.blaz.rondel.ComponentProvider;
 import solar.blaz.rondel.compiler.model.ComponentModel;
@@ -167,27 +165,69 @@ public abstract class AbstractInjectorManager {
         return null;
     }
 
-    protected String formatBuilderModule(TypeElement[] moduleElements, List<Object> formatParams, TypeMirror injectedInstance) {
-
-        StringBuilder builder = new StringBuilder();
+    protected void addTestSpecs(TypeElement[] moduleElements, TypeSpec.Builder injector, TypeMirror injectedInstance) {
 
         for (TypeElement module : moduleElements) {
             TypeName moduleName = TypeName.get(module.asType());
-            String moduleMethodName = module.getSimpleName().toString();
-            moduleMethodName = Character.toLowerCase(moduleMethodName.charAt(0)) + moduleMethodName.substring(1);
+            String moduleNameStringUpper = module.getSimpleName().toString();
+            String moduleNameStringLower = moduleNameStringUpper.substring(0, 1).toLowerCase()
+                    + moduleNameStringUpper.substring(1);
 
             ExecutableElement modelConstructor = getConstructor(module, injectedInstance);
 
             if (modelConstructor != null) {
-                if (modelConstructor.getParameters().size() > 0) {
-                    builder.append("        .$L(new $T(injectie))\n");
-                    formatParams.add(moduleMethodName);
-                    formatParams.add(moduleName);
+
+                CodeBlock.Builder modelMethod = CodeBlock.builder()
+                        .add("if ($L != null) {", moduleNameStringLower)
+                        .add("return $L;", moduleNameStringLower)
+                        .add("} else {");
+
+
+                int paramCnt = modelConstructor.getParameters().size();
+                if (paramCnt == 1) {
+                    modelMethod.add("return new $T(injectie);", moduleName);
+                } else if (paramCnt == 0) {
+                    modelMethod.add("return new $T();", moduleName);
+                } else {
+                    messager.error("Could not find constructor parameters.");
                 }
+
+                modelMethod.add("}");
+
+                injector
+                        .addField(FieldSpec.builder(moduleName, moduleNameStringLower)
+                                .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
+                                .build())
+                        .addMethod(MethodSpec.methodBuilder("set" + moduleNameStringUpper)
+                                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                                .addParameter(moduleName, "module")
+                                .addCode("$L = module;", moduleNameStringLower)
+                                .build())
+                        .addMethod(MethodSpec.methodBuilder("get" + moduleNameStringUpper)
+                                .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
+                                .addParameter(TypeName.get(injectedInstance), "injectie")
+                                .returns(moduleName)
+                                .addCode(modelMethod.build())
+                                .build())
+                        .build();
             } else {
                 messager.error("No valid constructor for module.");
             }
+        }
 
+    }
+
+    protected String formatBuilderModule(TypeElement[] moduleElements, List<Object> formatParams) {
+
+        StringBuilder builder = new StringBuilder();
+
+        for (TypeElement module : moduleElements) {
+            String moduleMethodName = module.getSimpleName().toString();
+            String moduleMethodNameLower = Character.toLowerCase(moduleMethodName.charAt(0)) + moduleMethodName.substring(1);
+
+            builder.append("        .$L(get$L(injectie))\n");
+            formatParams.add(moduleMethodNameLower);
+            formatParams.add(moduleMethodName);
         }
 
         return builder.toString();

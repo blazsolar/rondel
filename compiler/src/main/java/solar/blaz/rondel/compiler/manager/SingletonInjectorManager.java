@@ -188,7 +188,7 @@ public class SingletonInjectorManager extends AbstractInjectorManager {
 
         String methodFormat = "$T component = $T.builder()\n";
 
-        methodFormat += formatBuilderModule(model.modules, formatParams, model.view);
+        methodFormat += formatBuilderModule(model.modules, formatParams);
 
         methodFormat += "        .build();\n" +
                 "component.inject(injectie);\n" +
@@ -198,17 +198,18 @@ public class SingletonInjectorManager extends AbstractInjectorManager {
                 .add(methodFormat, formatParams.toArray())
                 .build();
 
-        TypeSpec injector = TypeSpec.classBuilder(model.name)
+        TypeSpec.Builder injector = TypeSpec.classBuilder(model.name)
                 .addModifiers(Modifier.PUBLIC)
                 .addMethod(MethodSpec.methodBuilder("inject")
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .returns(component)
                         .addParameter(TypeName.get(model.view), "injectie")
                         .addCode(injectLogic)
-                        .build())
-                .build();
+                        .build());
 
-        JavaFile.builder(model.packageName, injector)
+        addTestSpecs(model.modules, injector, model.view);
+
+        JavaFile.builder(model.packageName, injector.build())
                 .indent("    ")
                 .build()
                 .writeTo(filer);

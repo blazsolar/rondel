@@ -116,13 +116,28 @@ public class ServiceInjectorTest {
                 "\n" +
                 "class RondelTestService {\n" +
                 "    \n" +
+                "    private static TestModule testModule;\n" +
+                "    \n" +
                 "    public static RondelTestServiceComponent inject(TestService injectie) {\n" +
                 "        TestApp app = (TestApp) injectie.getApplicationContext();\n" +
                 "        RondelTestAppComponent baseComponent = (RondelTestAppComponent) app.getComponent();\n" +
                 "        RondelTestServiceComponent component = baseComponent.rondelTestServiceComponentBuilder()\n" +
+                "                .testModule(getTestModule(injectie))\n" +
                 "                .build();\n" +
                 "        component.inject(injectie);\n" +
                 "        return component;\n" +
+                "    }\n" +
+                "    \n" +
+                "    public static void setTestModule(TestModule module) {\n" +
+                "        testModule = module;\n" +
+                "    }\n" +
+                "    \n" +
+                "    private static TestModule getTestModule(TestService injectie) {\n" +
+                "        if (testModule != null) {\n" +
+                "            return testModule;\n" +
+                "        } else {\n" +
+                "            return new TestModule();\n" +
+                "        }\n" +
                 "    }\n" +
                 "    \n" +
                 "}");

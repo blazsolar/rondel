@@ -181,11 +181,12 @@ public class ViewInjectorManager extends AbstractInjectorManager {
         MethodSpec injectMethod = injectMethod(model, parent);
 
         if (injectMethod != null) {
-            TypeSpec injector = TypeSpec.classBuilder(model.name)
-                    .addMethod(injectMethod)
-                    .build();
+            TypeSpec.Builder injector = TypeSpec.classBuilder(model.name)
+                    .addMethod(injectMethod);
 
-            JavaFile.builder(model.packageName, injector)
+            addTestSpecs(model.modules, injector, model.view);
+
+            JavaFile.builder(model.packageName, injector.build())
                     .indent("    ")
                     .build()
                     .writeTo(filer);
@@ -225,7 +226,7 @@ public class ViewInjectorManager extends AbstractInjectorManager {
                     "$T baseComponent = ($T) app.getComponent();\n" +
                     "$T component = baseComponent.$L()\n");
 
-            formatBuilder.append(formatBuilderModule(model.modules, formatParams, model.view));
+            formatBuilder.append(formatBuilderModule(model.modules, formatParams));
 
             formatBuilder.append("        .build();\n" +
                     "component.inject(injectie);\n" +
@@ -249,7 +250,7 @@ public class ViewInjectorManager extends AbstractInjectorManager {
                     "$T baseComponent = ($T) activity.getComponent();\n" +
                     "$T component = baseComponent.$L()\n");
 
-            formatBuilder.append(formatBuilderModule(model.modules, formatParams, model.view));
+            formatBuilder.append(formatBuilderModule(model.modules, formatParams));
 
             formatBuilder.append("        .build();\n" +
                     "component.inject(injectie);\n" +

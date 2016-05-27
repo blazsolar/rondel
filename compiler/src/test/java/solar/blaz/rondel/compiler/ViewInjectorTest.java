@@ -388,13 +388,28 @@ public class ViewInjectorTest {
                 "\n" +
                 "class RondelTestView {\n" +
                 "    \n" +
+                "    private static TestViewModule testViewModule;\n" +
+                "    \n" +
                 "    public static RondelTestViewComponent inject(TestView injectie) {\n" +
                 "        TestActivity activity = (TestActivity) injectie.getContext();\n" +
                 "        RondelTestActivityComponent baseComponent = (RondelTestActivityComponent) activity.getComponent();\n" +
                 "        RondelTestViewComponent component = baseComponent.rondelTestViewComponentBuilder()\n" +
+                "                .testViewModule(getTestViewModule(injectie))\n" +
                 "                .build();\n" +
                 "        component.inject(injectie);\n" +
                 "        return component;\n" +
+                "    }\n" +
+                "    \n" +
+                "    public static void setTestViewModule(TestViewModule module) {\n" +
+                "        testViewModule = module;\n" +
+                "    }\n" +
+                "    \n" +
+                "    private static TestViewModule getTestViewModule(TestView injectie) {\n" +
+                "        if (testViewModule != null) {\n" +
+                "            return testViewModule;\n" +
+                "        } else {\n" +
+                "            return new TestViewModule();\n" +
+                "        }\n" +
                 "    }\n" +
                 "    \n" +
                 "}");
