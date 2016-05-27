@@ -403,12 +403,24 @@ public class ActivityInjectorTest {
                 "\n" +
                 "class RondelTestActivity {\n" +
                 "    \n" +
+                "    private static RondelTestAppComponent component;\n" +
                 "    private static TestModule testModule;\n" +
+                "    \n" +
+                "    private static RondelTestAppComponent getComponent(TestApp app) {\n" +
+                "        if (component != null) {\n" +
+                "            return component;\n" +
+                "        } else {\n" +
+                "            return (RondelTestAppComponent) app.getComponent();\n" +
+                "        }\n" +
+                "    }\n" +
+                "    \n" +
+                "    public static void setComponent(RondelTestAppComponent component) {\n" +
+                "        RondelTestActivity.component = component;\n" +
+                "    }\n" +
                 "    \n" +
                 "    public static RondelTestActivityComponent inject(TestActivity injectie) {\n" +
                 "        TestApp app = (TestApp) injectie.getApplicationContext();\n" +
-                "        RondelTestAppComponent baseComponent = (RondelTestAppComponent) app.getComponent();\n" +
-                "        RondelTestActivityComponent component = baseComponent.rondelTestActivityComponentBuilder()\n" +
+                "        RondelTestActivityComponent component = getComponent(app).rondelTestActivityComponentBuilder()\n" +
                 "                .testModule(getTestModule(injectie))\n" +
                 "                .build();\n" +
                 "        component.inject(injectie);\n" +
@@ -537,12 +549,24 @@ public class ActivityInjectorTest {
                 "\n" +
                 "class RondelTestActivity {\n" +
                 "    \n" +
+                "    private static RondelTestAppComponent component;\n" +
                 "    private static TestModule testModule;\n" +
+                "    \n" +
+                "    private static RondelTestAppComponent getComponent(TestApp app) {\n" +
+                "        if (component != null) {\n" +
+                "            return component;\n" +
+                "        } else {\n" +
+                "            return (RondelTestAppComponent) app.getComponent();\n" +
+                "        }\n" +
+                "    }\n" +
+                "    \n" +
+                "    public static void setComponent(RondelTestAppComponent component) {\n" +
+                "        RondelTestActivity.component = component;\n" +
+                "    }\n" +
                 "    \n" +
                 "    public static RondelTestActivityComponent inject(TestActivity injectie) {\n" +
                 "        TestApp app = (TestApp) injectie.getApplicationContext();\n" +
-                "        RondelTestAppComponent baseComponent = (RondelTestAppComponent) app.getComponent();\n" +
-                "        RondelTestActivityComponent component = baseComponent.rondelTestActivityComponentBuilder()\n" +
+                "        RondelTestActivityComponent component = getComponent(app).rondelTestActivityComponentBuilder()\n" +
                 "                .testModule(getTestModule(injectie))\n" +
                 "                .build();\n" +
                 "        component.inject(injectie);\n" +
@@ -747,12 +771,24 @@ public class ActivityInjectorTest {
                 "\n" +
                 "class RondelTestActivity {\n" +
                 "    \n" +
+                "    private static RondelTestAppComponent component;\n" +
                 "    private static TestModule testModule;\n" +
+                "    \n" +
+                "    private static RondelTestAppComponent getComponent(TestApp app) {\n" +
+                "        if (component != null) {\n" +
+                "            return component;\n" +
+                "        } else {\n" +
+                "            return (RondelTestAppComponent) app.getComponent();\n" +
+                "        }\n" +
+                "    }\n" +
+                "    \n" +
+                "    public static void setComponent(RondelTestAppComponent component ){\n" +
+                "        RondelTestActivity.component = component;\n" +
+                "    }\n" +
                 "    \n" +
                 "    public static RondelTestActivityComponent inject(TestActivity injectie) {\n" +
                 "        TestApp app = (TestApp) injectie.getApplicationContext();\n" +
-                "        RondelTestAppComponent baseComponent = (RondelTestAppComponent) app.getComponent();\n" +
-                "        RondelTestActivityComponent component = baseComponent.rondelTestActivityComponentBuilder()\n" +
+                "        RondelTestActivityComponent component = getComponent(app).rondelTestActivityComponentBuilder()\n" +
                 "                .testModule(getTestModule(injectie))\n" +
                 "                .build();\n" +
                 "        component.inject(injectie);\n" +
@@ -894,13 +930,25 @@ public class ActivityInjectorTest {
                 "\n" +
                 "class RondelTestActivity {\n" +
                 "    \n" +
+                "    private static RondelTestAppComponent component;\n" +
                 "    private static TestModule testModule;\n" +
                 "    private static TestModule2 testModule2;\n" +
+                "\n" +
+                "    private static RondelTestAppComponent getComponent(TestApp app) {\n" +
+                "        if (component != null) {\n" +
+                "            return component;\n" +
+                "        } else {\n" +
+                "            return (RondelTestAppComponent) app.getComponent();\n" +
+                "        }\n" +
+                "    }\n" +
+                "\n" +
+                "    public static void setComponent(RondelTestAppComponent component ){\n" +
+                "        RondelTestActivity.component = component;\n" +
+                "    }\n" +
                 "    \n" +
                 "    public static RondelTestActivityComponent inject(TestActivity injectie) {\n" +
                 "        TestApp app = (TestApp) injectie.getApplicationContext();\n" +
-                "        RondelTestAppComponent baseComponent = (RondelTestAppComponent) app.getComponent();\n" +
-                "        RondelTestActivityComponent component = baseComponent.rondelTestActivityComponentBuilder()\n" +
+                "        RondelTestActivityComponent component = getComponent(app).rondelTestActivityComponentBuilder()\n" +
                 "                .testModule(getTestModule(injectie))\n" +
                 "                .testModule2(getTestModule2(injectie))\n" +
                 "                .build();\n" +
@@ -1059,13 +1107,25 @@ public class ActivityInjectorTest {
                 "\n" +
                 "class RondelTestActivity {\n" +
                 "    \n" +
+                "    private static RondelTestAppComponent component;\n" +
                 "    private static TestModule testModule;\n" +
                 "    private static TestModule2 testModule2;\n" +
+                "\n" +
+                "    private static RondelTestAppComponent getComponent(TestApp app) {\n" +
+                "        if (component != null) {\n" +
+                "            return component;\n" +
+                "        } else {\n" +
+                "            return (RondelTestAppComponent) app.getComponent();\n" +
+                "        }\n" +
+                "    }\n" +
+                "\n" +
+                "    public static void setComponent(RondelTestAppComponent component ){\n" +
+                "        RondelTestActivity.component = component;\n" +
+                "    }\n" +
                 "    \n" +
                 "    public static RondelTestActivityComponent inject(TestActivity injectie) {\n" +
                 "        TestApp app = (TestApp) injectie.getApplicationContext();\n" +
-                "        RondelTestAppComponent baseComponent = (RondelTestAppComponent) app.getComponent();\n" +
-                "        RondelTestActivityComponent component = baseComponent.rondelTestActivityComponentBuilder()\n" +
+                "        RondelTestActivityComponent component = getComponent(app).rondelTestActivityComponentBuilder()\n" +
                 "                .testModule(getTestModule(injectie))\n" +
                 "                .testModule2(getTestModule2(injectie))\n" +
                 "                .build();\n" +

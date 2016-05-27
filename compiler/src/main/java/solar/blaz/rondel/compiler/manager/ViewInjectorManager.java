@@ -178,23 +178,19 @@ public class ViewInjectorManager extends AbstractInjectorManager {
 
     private void writeInjector(InjectorModel model, ComponentModel parent) throws IOException {
 
-        MethodSpec injectMethod = injectMethod(model, parent);
+        TypeSpec.Builder injector = TypeSpec.classBuilder(model.name);
 
-        if (injectMethod != null) {
-            TypeSpec.Builder injector = TypeSpec.classBuilder(model.name)
-                    .addMethod(injectMethod);
+        addInjectMethods(model, parent, injector);
+        addTestSpecs(model.modules, injector, model.view);
 
-            addTestSpecs(model.modules, injector, model.view);
-
-            JavaFile.builder(model.packageName, injector.build())
-                    .indent("    ")
-                    .build()
-                    .writeTo(filer);
-        }
+        JavaFile.builder(model.packageName, injector.build())
+                .indent("    ")
+                .build()
+                .writeTo(filer);
 
     }
 
-    private MethodSpec injectMethod(InjectorModel model, ComponentModel parent) {
+    private void addInjectMethods(InjectorModel model, ComponentModel parent, TypeSpec.Builder injector) {
 
         String name = model.component.name;
         String builderMethodName = Character.toLowerCase(name.charAt(0)) + name.substring(1) + "Builder";
@@ -214,17 +210,35 @@ public class ViewInjectorManager extends AbstractInjectorManager {
 
         if (isActivity || isService) {
 
+            injector.addField(appComponentClass, "component", Modifier.PRIVATE, Modifier.STATIC);
+
+            injector.addMethod(MethodSpec.methodBuilder("getComponent")
+                    .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
+                    .returns(appComponentClass)
+                    .addParameter(appClass, "app")
+                    .addCode(CodeBlock.builder()
+                            .add("if (component != null) {")
+                            .add("return component;")
+                            .add("} else {")
+                            .add("return ($T) app.getComponent();", appComponentClass)
+                            .add("}")
+                            .build())
+                    .build());
+
+            injector.addMethod(MethodSpec.methodBuilder("setComponent")
+                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                    .addParameter(appComponentClass, "component")
+                    .addCode("$L.component = component;", model.name)
+                    .build());
+
             List<Object> formatParams = new ArrayList<>();
             formatParams.add(appClass);
             formatParams.add(appClass);
-            formatParams.add(appComponentClass);
-            formatParams.add(appComponentClass);
             formatParams.add(component);
             formatParams.add(builderMethodName);
 
             StringBuilder formatBuilder = new StringBuilder("$T app = ($T) injectie.getApplicationContext();\n" +
-                    "$T baseComponent = ($T) app.getComponent();\n" +
-                    "$T component = baseComponent.$L()\n");
+                    "$T component = getComponent(app).$L()\n");
 
             formatBuilder.append(formatBuilderModule(model.modules, formatParams));
 
@@ -238,7 +252,7 @@ public class ViewInjectorManager extends AbstractInjectorManager {
 
         } else if (isView) {
 
-            List<Object> formatParams = new ArrayList<Object>();
+            List<Object> formatParams = new ArrayList<>();
             formatParams.add(appClass);
             formatParams.add(appClass);
             formatParams.add(appComponentClass);
@@ -266,14 +280,12 @@ public class ViewInjectorManager extends AbstractInjectorManager {
         }
 
         if (injectLogic != null) {
-            return MethodSpec.methodBuilder("inject")
+            injector.addMethod(MethodSpec.methodBuilder("inject")
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                     .returns(component)
                     .addParameter(TypeName.get(model.view), "injectie")
                     .addCode(injectLogic)
-                    .build();
-        } else {
-            return null;
+                    .build());
         }
 
     }
