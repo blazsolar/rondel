@@ -29,7 +29,7 @@ apply plugin: 'idea'
 apply plugin: "net.ltgt.apt"
 
 group 'solar.blaz'
-version '1.0.0-SNAPSHOT'
+version '0.1.1'
 
 def isReleaseBuild() {
     return version.contains("SNAPSHOT") == false
