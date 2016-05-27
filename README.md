@@ -4,4 +4,5 @@ Rondel is Android library that generates [Dagger](http://google.github.io/dagger
 
 ## Limitations
  * No support for nested Views
- * No Support for Fragments
+ * No support for Fragments
+ * No support for overriding Components and Activities on Views
