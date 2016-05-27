@@ -30,3 +30,7 @@ apply plugin: "net.ltgt.apt"
 
 group 'solar.blaz'
 version '1.0.0-SNAPSHOT'
+
+def isReleaseBuild() {
+    return version.contains("SNAPSHOT") == false
+}
