@@ -89,9 +89,6 @@ public abstract class AbstractInjectorManager {
         boolean isView = typesUtil.isSubtype(element.asType(), viewProviderElement.asType());
 
         if (componentClass == null || typesUtil.isSubtype(componentClass, voidElement.asType())) {
-            if (isView) {
-                messager.error("View has to specify parent.", element);
-            }
             return null; // no parent
         } else {
 
@@ -116,7 +113,6 @@ public abstract class AbstractInjectorManager {
 
     protected TypeElement[] parseModuleElements(ImmutableList<TypeMirror> modules) {
         if (modules == null || modules.size() == 0) {
-            messager.error("App module was not provided.");
             return null;
         } else {
             boolean validModules = true;
@@ -167,51 +163,53 @@ public abstract class AbstractInjectorManager {
 
     protected void addTestSpecs(TypeElement[] moduleElements, TypeSpec.Builder injector, TypeMirror injectedInstance) {
 
-        for (TypeElement module : moduleElements) {
-            TypeName moduleName = TypeName.get(module.asType());
-            String moduleNameStringUpper = module.getSimpleName().toString();
-            String moduleNameStringLower = moduleNameStringUpper.substring(0, 1).toLowerCase()
-                    + moduleNameStringUpper.substring(1);
+        if (moduleElements != null && moduleElements.length > 0) {
+            for (TypeElement module : moduleElements) {
+                TypeName moduleName = TypeName.get(module.asType());
+                String moduleNameStringUpper = module.getSimpleName().toString();
+                String moduleNameStringLower = moduleNameStringUpper.substring(0, 1).toLowerCase()
+                        + moduleNameStringUpper.substring(1);
 
-            ExecutableElement modelConstructor = getConstructor(module, injectedInstance);
+                ExecutableElement modelConstructor = getConstructor(module, injectedInstance);
 
-            if (modelConstructor != null) {
+                if (modelConstructor != null) {
 
-                CodeBlock.Builder modelMethod = CodeBlock.builder()
-                        .add("if ($L != null) {", moduleNameStringLower)
-                        .add("return $L;", moduleNameStringLower)
-                        .add("} else {");
+                    CodeBlock.Builder modelMethod = CodeBlock.builder()
+                            .add("if ($L != null) {", moduleNameStringLower)
+                            .add("return $L;", moduleNameStringLower)
+                            .add("} else {");
 
 
-                int paramCnt = modelConstructor.getParameters().size();
-                if (paramCnt == 1) {
-                    modelMethod.add("return new $T(injectie);", moduleName);
-                } else if (paramCnt == 0) {
-                    modelMethod.add("return new $T();", moduleName);
+                    int paramCnt = modelConstructor.getParameters().size();
+                    if (paramCnt == 1) {
+                        modelMethod.add("return new $T(injectie);", moduleName);
+                    } else if (paramCnt == 0) {
+                        modelMethod.add("return new $T();", moduleName);
+                    } else {
+                        messager.error("Could not find constructor parameters.");
+                    }
+
+                    modelMethod.add("}");
+
+                    injector
+                            .addField(FieldSpec.builder(moduleName, moduleNameStringLower)
+                                    .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
+                                    .build())
+                            .addMethod(MethodSpec.methodBuilder("set" + moduleNameStringUpper)
+                                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                                    .addParameter(moduleName, "module")
+                                    .addCode("$L = module;", moduleNameStringLower)
+                                    .build())
+                            .addMethod(MethodSpec.methodBuilder("get" + moduleNameStringUpper)
+                                    .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
+                                    .addParameter(TypeName.get(injectedInstance), "injectie")
+                                    .returns(moduleName)
+                                    .addCode(modelMethod.build())
+                                    .build())
+                            .build();
                 } else {
-                    messager.error("Could not find constructor parameters.");
+                    messager.error("No valid constructor for module.");
                 }
-
-                modelMethod.add("}");
-
-                injector
-                        .addField(FieldSpec.builder(moduleName, moduleNameStringLower)
-                                .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
-                                .build())
-                        .addMethod(MethodSpec.methodBuilder("set" + moduleNameStringUpper)
-                                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                                .addParameter(moduleName, "module")
-                                .addCode("$L = module;", moduleNameStringLower)
-                                .build())
-                        .addMethod(MethodSpec.methodBuilder("get" + moduleNameStringUpper)
-                                .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
-                                .addParameter(TypeName.get(injectedInstance), "injectie")
-                                .returns(moduleName)
-                                .addCode(modelMethod.build())
-                                .build())
-                        .build();
-            } else {
-                messager.error("No valid constructor for module.");
             }
         }
 
@@ -221,13 +219,15 @@ public abstract class AbstractInjectorManager {
 
         StringBuilder builder = new StringBuilder();
 
-        for (TypeElement module : moduleElements) {
-            String moduleMethodName = module.getSimpleName().toString();
-            String moduleMethodNameLower = Character.toLowerCase(moduleMethodName.charAt(0)) + moduleMethodName.substring(1);
+        if (moduleElements != null && moduleElements.length > 0) {
+            for (TypeElement module : moduleElements) {
+                String moduleMethodName = module.getSimpleName().toString();
+                String moduleMethodNameLower = Character.toLowerCase(moduleMethodName.charAt(0)) + moduleMethodName.substring(1);
 
-            builder.append("        .$L(get$L(injectie))\n");
-            formatParams.add(moduleMethodNameLower);
-            formatParams.add(moduleMethodName);
+                builder.append("        .$L(get$L(injectie))\n");
+                formatParams.add(moduleMethodNameLower);
+                formatParams.add(moduleMethodName);
+            }
         }
 
         return builder.toString();

@@ -75,27 +75,25 @@ public class SingletonInjectorManager extends AbstractInjectorManager {
                         TypeElement[] modleElements = parseModuleElements(modules);
                         TypeElement[] componentElements = parseViewComponent(components);
 
-                        if (modleElements != null) {
-                            ComponentModel componentModel = new ComponentModel(app);
-                            componentModel.name = Constants.CLASS_PREFIX + app.getSimpleName() + "Component";
-                            componentModel.packageName = elementUtils.getPackageOf(app).getQualifiedName().toString();
-                            componentModel.view = app.asType();
-                            componentModel.modules = modleElements;
-                            componentModel.components = componentElements;
+                        ComponentModel componentModel = new ComponentModel(app);
+                        componentModel.name = Constants.CLASS_PREFIX + app.getSimpleName() + "Component";
+                        componentModel.packageName = elementUtils.getPackageOf(app).getQualifiedName().toString();
+                        componentModel.view = app.asType();
+                        componentModel.modules = modleElements;
+                        componentModel.components = componentElements;
 
-                            InjectorModel injectorModel = new InjectorModel(app);
-                            injectorModel.name = Constants.CLASS_PREFIX + app.getSimpleName();
-                            injectorModel.packageName = elementUtils.getPackageOf(app).getQualifiedName().toString();
-                            injectorModel.view = app.asType();
+                        InjectorModel injectorModel = new InjectorModel(app);
+                        injectorModel.name = Constants.CLASS_PREFIX + app.getSimpleName();
+                        injectorModel.packageName = elementUtils.getPackageOf(app).getQualifiedName().toString();
+                        injectorModel.view = app.asType();
 
-                            injectorModel.component = componentModel;
-                            injectorModel.superType = ((TypeElement) app).getSuperclass();
-                            injectorModel.modules = modleElements;
-                            componentModel.injector = injectorModel;
+                        injectorModel.component = componentModel;
+                        injectorModel.superType = ((TypeElement) app).getSuperclass();
+                        injectorModel.modules = modleElements;
+                        componentModel.injector = injectorModel;
 
-                            appComponent = componentModel;
-                            return appComponent;
-                        }
+                        appComponent = componentModel;
+                        return appComponent;
                     }
                     break;
                 }
@@ -155,12 +153,14 @@ public class SingletonInjectorManager extends AbstractInjectorManager {
 
         codeBlock.add(" }");
 
-        AnnotationSpec annotation = AnnotationSpec.builder(ClassName.get("dagger", "Component"))
-                .addMember("modules", codeBlock.build())
-                .build();
+        AnnotationSpec.Builder componentAnnotation = AnnotationSpec.builder(ClassName.get("dagger", "Component"));
+
+        if (modules != null && modules.length > 0) {
+            componentAnnotation.addMember("modules", codeBlock.build());
+        }
 
         TypeSpec.Builder builder = TypeSpec.interfaceBuilder(model.name)
-                .addAnnotation(annotation)
+                .addAnnotation(componentAnnotation.build())
                 .addAnnotation(ClassName.get("javax.inject", "Singleton"))
                 .addModifiers(Modifier.PUBLIC)
                 .addSuperinterface(BaseAppComponent.class);

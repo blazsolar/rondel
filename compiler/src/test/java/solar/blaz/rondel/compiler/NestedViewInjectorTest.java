@@ -67,7 +67,7 @@ public class NestedViewInjectorTest {
                 "        modules = AppModule.class\n" +
                 ")\n" +
                 "public class TestApp extends Application implements AppComponentProvider {\n" +
-                "    public RondelAppComponent getComponent() {\n" +
+                "    public RondelTestAppComponent getComponent() {\n" +
                 "        return null;\n" +
                 "    }\n" +
                 "}");
@@ -139,12 +139,69 @@ public class NestedViewInjectorTest {
                 "    }\n" +
                 "}");
 
+        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.ui.view.RondelTestView", "package test.ui.view;\n" +
+                "\n" +
+                "import test.RondelTestAppComponent;\n" +
+                "import test.TestApp;\n" +
+                "\n" +
+                "class RondelTestView {\n" +
+                "    \n" +
+                "    private static TestViewModule testViewModule;\n" +
+                "    \n" +
+                "    public static RondelTestViewComponent inject(TestView injectie) {\n" +
+                "        TestApp parent = (TestApp) injectie.getContext().getApplicationContext();\n" +
+                "        RondelTestAppComponent baseComponent = (RondelTestAppComponent) parent.getComponent();\n" +
+                "        RondelTestViewComponent component = baseComponent.rondelTestViewComponentBuilder()\n" +
+                "                .testViewModule(getTestViewModule(injectie))\n" +
+                "                .build();\n" +
+                "        component.inject(injectie);\n" +
+                "        return component;\n" +
+                "    }\n" +
+                "    \n" +
+                "    public static void setTestViewModule(TestViewModule module) {\n" +
+                "        testViewModule = module;\n" +
+                "    }\n" +
+                "    \n" +
+                "    private static TestViewModule getTestViewModule(TestView injectie) {\n" +
+                "        if (testViewModule != null) {\n" +
+                "            return testViewModule;\n" +
+                "        } else {\n" +
+                "            return new TestViewModule();\n" +
+                "        }\n" +
+                "    }\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.ui.view.RondelTestViewComponent", "package test.ui.view;\n" +
+                "\n" +
+                "import dagger.Subcomponent;\n" +
+                "import solar.blaz.rondel.BaseComponent;\n" +
+                "import solar.blaz.rondel.ViewScope;\n" +
+                "\n" +
+                "@Subcomponent(\n" +
+                "        modules = { TestViewModule.class }\n" +
+                ")\n" +
+                "@ViewScope\n" +
+                "public interface RondelTestViewComponent extends BaseComponent, TestViewComponent {\n" +
+                "    \n" +
+                "    void inject(TestView view);\n" +
+                "    \n" +
+                "    @Subcomponent.Builder\n" +
+                "    interface Builder {\n" +
+                "        Builder testViewModule(TestViewModule module);\n" +
+                "        RondelTestViewComponent build();\n" +
+                "    }\n" +
+                "    \n" +
+                "}");
+
+
         assertAbout(javaSources())
                 .that(ImmutableList.of(appFile, moduleFile, componentFile, activityFile, activityModuleFile,
                         activityComponentFile, viewModuleFile, viewComponentFile, viewFile))
                 .processedWith(new RondelProcessor(), new ComponentProcessor())
-                .failsToCompile()
-                .withErrorContaining("View has to specify parent.");
+                .compilesWithoutError()
+                .and()
+                .generatesSources(expectedInjector, expectedComponent);
 
     }
 
@@ -391,8 +448,8 @@ public class NestedViewInjectorTest {
                 "    private static TestViewModule testViewModule;\n" +
                 "    \n" +
                 "    public static RondelTestViewComponent inject(TestView injectie) {\n" +
-                "        TestActivity activity = (TestActivity) injectie.getContext();\n" +
-                "        RondelTestActivityComponent baseComponent = (RondelTestActivityComponent) activity.getComponent();\n" +
+                "        TestActivity parent = (TestActivity) injectie.getContext();\n" +
+                "        RondelTestActivityComponent baseComponent = (RondelTestActivityComponent) parent.getComponent();\n" +
                 "        RondelTestViewComponent component = baseComponent.rondelTestViewComponentBuilder()\n" +
                 "                .testViewModule(getTestViewModule(injectie))\n" +
                 "                .build();\n" +

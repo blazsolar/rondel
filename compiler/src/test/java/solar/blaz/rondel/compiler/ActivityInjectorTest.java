@@ -148,13 +148,18 @@ public class ActivityInjectorTest {
 
         JavaFileObject appFile = JavaFileObjects.forSourceString("test.App", "package test;\n" +
                 "\n" +
+                "import android.app.Application;\n" +
+                "import solar.blaz.rondel.AppComponentProvider;\n" +
+                "\n" +
                 "@solar.blaz.rondel.App(\n" +
                 "        components = test.AppComponent.class,\n" +
                 "        modules = test.AppModule.class\n" +
                 ")\n" +
-                "public class App {\n" +
-                "    \n" +
-                "}");
+                "public class App extends Application implements AppComponentProvider {\n" +
+                "    public RondelAppComponent getComponent() {\n" +
+                "        return null;\n" +
+                "    }\n" +
+                "}\n");
 
         JavaFileObject activityComponentFile = JavaFileObjects.forSourceString("test.ui.TestComponent", "package test.ui;\n" +
                 "\n" +
@@ -177,11 +182,62 @@ public class ActivityInjectorTest {
                 "    \n" +
                 "}");
 
+        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.ui.RondelTestActivity", "package test.ui;\n" +
+                "\n" +
+                "import test.App;\n" +
+                "import test.RondelAppComponent;\n" +
+                "\n" +
+                "class RondelTestActivity {\n" +
+                "    \n" +
+                "    private static RondelAppComponent component;\n" +
+                "    \n" +
+                "    private static RondelAppComponent getComponent(App app) {\n" +
+                "        if (component != null) {\n" +
+                "            return component;\n" +
+                "        } else {\n" +
+                "            return (RondelAppComponent) app.getComponent();\n" +
+                "        }\n" +
+                "    }\n" +
+                "    \n" +
+                "    public static void setComponent(RondelAppComponent component) {\n" +
+                "        RondelTestActivity.component = component;\n" +
+                "    }\n" +
+                "    \n" +
+                "    public static RondelTestActivityComponent inject(TestActivity injectie) {\n" +
+                "        App app = (App) injectie.getApplicationContext();\n" +
+                "        RondelTestActivityComponent component = getComponent(app).rondelTestActivityComponentBuilder()\n" +
+                "                .build();\n" +
+                "        component.inject(injectie);\n" +
+                "        return component;\n" +
+                "    }\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.ui.RondelTestActivityComponent", "package test.ui;\n" +
+                "\n" +
+                "import dagger.Subcomponent;\n" +
+                "import solar.blaz.rondel.BaseComponent;\n" +
+                "import solar.blaz.rondel.ViewScope;\n" +
+                "\n" +
+                "@Subcomponent\n" +
+                "@ViewScope\n" +
+                "public interface RondelTestActivityComponent extends BaseComponent, TestComponent {\n" +
+                "    \n" +
+                "    void inject(TestActivity view);\n" +
+                "\n" +
+                "    @Subcomponent.Builder\n" +
+                "    interface Builder {\n" +
+                "        RondelTestActivityComponent build();\n" +
+                "    }\n" +
+                "    \n" +
+                "}");
+
         assertAbout(javaSources())
                 .that(ImmutableList.of(appFile, moduleFile, componentFile, activityFile, activityComponentFile))
-                .processedWith(new RondelProcessor())
-                .failsToCompile()
-                .withErrorContaining("App module was not provided.");
+                .processedWith(new RondelProcessor(), new ComponentProcessor())
+                .compilesWithoutError()
+                .and()
+                .generatesSources(expectedComponent, expectedInjector);
 
     }
 

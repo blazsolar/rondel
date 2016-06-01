@@ -17,6 +17,7 @@
 package solar.blaz.rondel.compiler.manager;
 
 import android.app.Activity;
+import android.app.Application;
 import android.app.Service;
 import android.view.View;
 import com.google.common.collect.ImmutableList;
@@ -61,7 +62,7 @@ public class ViewInjectorManager extends AbstractInjectorManager {
         this.typesUtil = typesUtil;
     }
 
-    public ComponentModel parse( Element element) {
+    public ComponentModel parse(Element element) {
 
         if (!isValidType(element)) {
             return null;
@@ -69,34 +70,29 @@ public class ViewInjectorManager extends AbstractInjectorManager {
 
         AnnotationMirror annotationMirror = getAnnotationMirror(element, Rondel.class).get();
 
-        ImmutableList<TypeMirror> modules = convertClassArrayToListOfTypes(annotationMirror, "modules");
         TypeElement[] components = parseViewComponent(convertClassArrayToListOfTypes(annotationMirror, "components"));
-        TypeElement[] modleElements = parseModuleElements(modules);
+        TypeElement[] moduleElements = parseModuleElements(convertClassArrayToListOfTypes(annotationMirror, "modules"));
 
         TypeMirror parent = verifyParent(element, convertClassToType(annotationMirror, "parent"));
 
-        if (modleElements != null) {
-            InjectorModel injectorModel = new InjectorModel(element);
-            injectorModel.name = Constants.CLASS_PREFIX + element.getSimpleName();
-            injectorModel.packageName = elementsUtil.getPackageOf(element).getQualifiedName().toString();
-            injectorModel.view = element.asType();
-            injectorModel.modules = modleElements;
-            injectorModel.superType = ((TypeElement) element).getSuperclass();
+        InjectorModel injectorModel = new InjectorModel(element);
+        injectorModel.name = Constants.CLASS_PREFIX + element.getSimpleName();
+        injectorModel.packageName = elementsUtil.getPackageOf(element).getQualifiedName().toString();
+        injectorModel.view = element.asType();
+        injectorModel.modules = moduleElements;
+        injectorModel.superType = ((TypeElement) element).getSuperclass();
 
-            ComponentModel componentModel = new ComponentModel(element);
-            componentModel.name = Constants.CLASS_PREFIX + element.getSimpleName() + "Component";
-            componentModel.packageName = ((PackageElement) element.getEnclosingElement()).getQualifiedName().toString();
-            componentModel.view = element.asType();
-            componentModel.modules = modleElements;
-            componentModel.components = components;
-            componentModel.parent = parent;
-            componentModel.injector = injectorModel;
-            injectorModel.component = componentModel;
+        ComponentModel componentModel = new ComponentModel(element);
+        componentModel.name = Constants.CLASS_PREFIX + element.getSimpleName() + "Component";
+        componentModel.packageName = ((PackageElement) element.getEnclosingElement()).getQualifiedName().toString();
+        componentModel.view = element.asType();
+        componentModel.modules = moduleElements;
+        componentModel.components = components;
+        componentModel.parent = parent;
+        componentModel.injector = injectorModel;
+        injectorModel.component = componentModel;
 
-            return componentModel;
-        } else {
-            return null;
-        }
+        return componentModel;
 
     }
 
@@ -113,12 +109,15 @@ public class ViewInjectorManager extends AbstractInjectorManager {
             moduleNames = new String[0];
         }
 
-        AnnotationSpec annotation = AnnotationSpec.builder(ClassName.get("dagger", "Subcomponent"))
-                .addMember("modules", "{ " + String.join(", ", moduleNames) + " }")
-                .build();
+        AnnotationSpec.Builder subcomponentAnnotation =
+                AnnotationSpec.builder(ClassName.get("dagger", "Subcomponent"));
+
+        if (moduleNames.length > 0) {
+            subcomponentAnnotation.addMember("modules", "{ " + String.join(", ", moduleNames) + " }");
+        }
 
         TypeSpec.Builder builder = TypeSpec.interfaceBuilder(model.name)
-                .addAnnotation(annotation)
+                .addAnnotation(subcomponentAnnotation.build())
                 .addAnnotation(ViewScope.class)
                 .addModifiers(Modifier.PUBLIC)
                 .addSuperinterface(ClassName.get(BaseComponent.class))
@@ -150,17 +149,20 @@ public class ViewInjectorManager extends AbstractInjectorManager {
         TypeSpec.Builder builder = TypeSpec.interfaceBuilder("Builder")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
-        for (TypeElement module : model.modules) {
+        TypeElement[] modules = model.modules;
+        if (modules != null && modules.length > 0) {
+            for (TypeElement module : modules) {
 
-            String moduleName = module.getSimpleName().toString();
-            TypeName moduleType = TypeName.get(module.asType());
-            String methodName = Character.toLowerCase(moduleName.charAt(0)) + moduleName.substring(1);
+                String moduleName = module.getSimpleName().toString();
+                TypeName moduleType = TypeName.get(module.asType());
+                String methodName = Character.toLowerCase(moduleName.charAt(0)) + moduleName.substring(1);
 
-            builder.addMethod(MethodSpec.methodBuilder(methodName)
-                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                    .returns(ClassName.bestGuess("Builder"))
-                    .addParameter(moduleType, "module")
-                    .build());
+                builder.addMethod(MethodSpec.methodBuilder(methodName)
+                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                        .returns(ClassName.bestGuess("Builder"))
+                        .addParameter(moduleType, "module")
+                        .build());
+            }
         }
 
         String name = model.name;
@@ -260,8 +262,17 @@ public class ViewInjectorManager extends AbstractInjectorManager {
             formatParams.add(component);
             formatParams.add(builderMethodName);
 
-            StringBuilder formatBuilder = new StringBuilder("$T activity = ($T) injectie.getContext();\n" +
-                    "$T baseComponent = ($T) activity.getComponent();\n" +
+            TypeElement appElement = elementsUtil.getTypeElement(Application.class.getCanonicalName());
+            boolean isApp = typesUtil.isSubtype(parent.element.asType(), appElement.asType());
+
+            StringBuilder formatBuilder = new StringBuilder();
+            if (isApp) {
+                formatBuilder.append("$T parent = ($T) injectie.getContext().getApplicationContext();\n");
+            } else {
+                formatBuilder.append("$T parent = ($T) injectie.getContext();\n");
+            }
+
+            formatBuilder.append("$T baseComponent = ($T) parent.getComponent();\n" +
                     "$T component = baseComponent.$L()\n");
 
             formatBuilder.append(formatBuilderModule(model.modules, formatParams));

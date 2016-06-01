@@ -24,6 +24,8 @@
     <bytecodeTargetLevel>
       <module name="rondel-compiler_main" target="1.8" />
       <module name="rondel-compiler_test" target="1.8" />
+      <module name="rondel-mockito_main" target="1.8" />
+      <module name="rondel-mockito_test" target="1.8" />
       <module name="rondel_main" target="1.6" />
       <module name="rondel_test" target="1.6" />
     </bytecodeTargetLevel>

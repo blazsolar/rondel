@@ -181,11 +181,37 @@ public class SingletonInjectorTest {
                 "    \n" +
                 "}");
 
+        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.RondelApp", "package test;\n" +
+                "\n" +
+                "public class RondelApp {\n" +
+                "    \n" +
+                "    public static RondelAppComponent inject(App injectie) {\n" +
+                "        RondelAppComponent component = DaggerRondelAppComponent.builder()\n" +
+                "                .build();\n" +
+                "        component.inject(injectie);\n" +
+                "        return component;\n" +
+                "    }\n" +
+                "\n" +
+                "}");
+
+        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.RondelAppComponent", "package test;\n" +
+                "\n" +
+                "import dagger.Component;\n" +
+                "import javax.inject.Singleton;\n" +
+                "import solar.blaz.rondel.BaseAppComponent;\n" +
+                "\n" +
+                "@Component\n" +
+                "@Singleton\n" +
+                "public interface RondelAppComponent extends BaseAppComponent, AppComponent {\n" +
+                "    void inject(App app);\n" +
+                "}");
+
         assertAbout(javaSources())
                 .that(ImmutableList.of(appFile, componentFile))
-                .processedWith(new RondelProcessor())
-                .failsToCompile()
-                .withErrorContaining("App module was not provided.");
+                .processedWith(new RondelProcessor(), new ComponentProcessor())
+                .compilesWithoutError()
+                .and()
+                .generatesSources(expectedComponent, expectedInjector);
 
     }
 
