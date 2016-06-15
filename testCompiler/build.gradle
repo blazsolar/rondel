@@ -1,0 +1,19 @@
+group LIBRARY_GROUP
+version LIBRARY_VERSION
+
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+apply plugin: "jacoco"
+apply plugin: 'idea'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(':rondel')
+    compile 'com.google.guava:guava:19.0'
+    compile 'com.squareup:javapoet:1.7.0'
+}

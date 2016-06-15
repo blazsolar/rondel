@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-group 'solar.blaz'
-version '0.1.2-SNAPSHOT'
+group LIBRARY_GROUP
+version LIBRARY_VERSION
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
@@ -27,7 +27,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.google.dagger:dagger:2.4'
+    compile 'com.google.dagger:dagger:2.5'
 }
 
 def mavenRepoUrl

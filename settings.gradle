@@ -15,8 +15,9 @@
  */
 
 rootProject.name = 'rondel-project'
-include 'compiler', 'api', 'mockito'
+include 'compiler', 'api', 'test', 'testCompiler'
 findProject(':compiler')?.name = 'rondel-compiler'
 findProject(':api')?.name = 'rondel'
-findProject(':mockito')?.name = 'rondel-mockito'
+findProject(':test')?.name = 'rondel-test'
+findProject(':testCompiler')?.name = 'rondel-test-compiler'
 

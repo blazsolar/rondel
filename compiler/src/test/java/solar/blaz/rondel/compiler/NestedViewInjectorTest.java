@@ -18,10 +18,12 @@ package solar.blaz.rondel.compiler;
 
 import com.google.common.collect.ImmutableList;
 import com.google.testing.compile.JavaFileObjects;
-import dagger.internal.codegen.ComponentProcessor;
-import org.junit.Test;
+
+import org.junit.gen5.api.Test;
 
 import javax.tools.JavaFileObject;
+
+import dagger.internal.codegen.ComponentProcessor;
 
 import static com.google.common.truth.Truth.assertAbout;
 import static com.google.testing.compile.JavaSourcesSubjectFactory.javaSources;

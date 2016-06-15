@@ -17,22 +17,40 @@
 package solar.blaz.rondel.compiler.manager;
 
 import android.view.View;
+
+import com.google.auto.common.MoreElements;
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
-import com.squareup.javapoet.*;
-import dagger.Module;
-import solar.blaz.rondel.ComponentProvider;
-import solar.blaz.rondel.compiler.model.ComponentModel;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
 
-import javax.lang.model.element.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
+import javax.lang.model.element.AnnotationValueVisitor;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.SimpleAnnotationValueVisitor6;
 import javax.lang.model.util.Types;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+
+import dagger.Module;
+import solar.blaz.rondel.ComponentProvider;
+import solar.blaz.rondel.compiler.model.ComponentModel;
 
 import static com.google.auto.common.AnnotationMirrors.getAnnotationValue;
 
@@ -165,6 +183,7 @@ public abstract class AbstractInjectorManager {
 
         if (moduleElements != null && moduleElements.length > 0) {
             for (TypeElement module : moduleElements) {
+
                 TypeName moduleName = TypeName.get(module.asType());
                 String moduleNameStringUpper = module.getSimpleName().toString();
                 String moduleNameStringLower = moduleNameStringUpper.substring(0, 1).toLowerCase()
@@ -210,6 +229,14 @@ public abstract class AbstractInjectorManager {
                 } else {
                     messager.error("No valid constructor for module.");
                 }
+
+                Optional<AnnotationMirror> annotationMirror = MoreElements.getAnnotationMirror(module, Module.class);
+                if (annotationMirror.isPresent()) {
+                    ImmutableList<TypeMirror> modules = convertClassArrayToListOfTypes(annotationMirror.get(), "includes");
+                    TypeElement[] nestedModuleelements = parseModuleElements(modules);
+                    addTestSpecs(nestedModuleelements, injector, injectedInstance);
+                }
+
             }
         }
 
@@ -219,6 +246,14 @@ public abstract class AbstractInjectorManager {
 
         StringBuilder builder = new StringBuilder();
 
+        formatBuilderModule(moduleElements, builder, formatParams);
+
+        return builder.toString();
+
+    }
+
+    private void formatBuilderModule(TypeElement[] moduleElements, StringBuilder builder, List<Object> formatParams) {
+
         if (moduleElements != null && moduleElements.length > 0) {
             for (TypeElement module : moduleElements) {
                 String moduleMethodName = module.getSimpleName().toString();
@@ -227,10 +262,16 @@ public abstract class AbstractInjectorManager {
                 builder.append("        .$L(get$L(injectie))\n");
                 formatParams.add(moduleMethodNameLower);
                 formatParams.add(moduleMethodName);
+
+                Optional<AnnotationMirror> annotationMirror = MoreElements.getAnnotationMirror(module, Module.class);
+                if (annotationMirror.isPresent()) {
+                    ImmutableList<TypeMirror> modules = convertClassArrayToListOfTypes(annotationMirror.get(), "includes");
+                    TypeElement[] nestedModuleelements = parseModuleElements(modules);
+                    formatBuilderModule(nestedModuleelements, builder, formatParams);
+                }
             }
         }
 
-        return builder.toString();
     }
 
     /**

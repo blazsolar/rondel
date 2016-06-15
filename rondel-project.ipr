@@ -7,8 +7,10 @@
       <entry name=".+\.(gif|png|jpeg|jpg)"/>
     </resourceExtensions>
     <wildcardResourcePatterns>
-      <entry name="!?*.java"/>
+      <entry name="!?*.class"/>
+      <entry name="!?*.scala"/>
       <entry name="!?*.groovy"/>
+      <entry name="!?*.java"/>
     </wildcardResourcePatterns>
     <bytecodeTargetLevel target="1.8"/>
     <annotationProcessing>
@@ -53,8 +55,8 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/rondel-project.iml" filepath="$PROJECT_DIR$/rondel-project.iml"/>
-      <module fileurl="file://$PROJECT_DIR$/compiler/rondel-compiler.iml" filepath="$PROJECT_DIR$/compiler/rondel-compiler.iml"/>
+      <module filepath="$PROJECT_DIR$/rondel-project.iml" fileurl="file://$PROJECT_DIR$/rondel-project.iml"/>
+      <module filepath="$PROJECT_DIR$/compiler/rondel-compiler.iml" fileurl="file://$PROJECT_DIR$/compiler/rondel-compiler.iml"/>
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" assert-keyword="true" jdk-15="true" project-jdk-type="JavaSDK" assert-jdk-15="true" project-jdk-name="1.8">

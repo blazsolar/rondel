@@ -16,25 +16,39 @@
 
 buildscript {
     repositories {
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
+        maven { url "https://plugins.gradle.org/m2/" }
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     }
     dependencies {
         classpath "net.ltgt.gradle:gradle-apt-plugin:0.5"
+        classpath 'org.junit:junit-gradle:5.0.0-SNAPSHOT'
     }
 }
 
-group 'solar.blaz'
-version '0.1.2-SNAPSHOT'
+group LIBRARY_GROUP
+version LIBRARY_VERSION
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 apply plugin: "jacoco"
 apply plugin: 'idea'
 apply plugin: "net.ltgt.apt"
+apply plugin: 'org.junit.gen5.gradle'
 
 sourceCompatibility = 1.8
+
+compileTestJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+    options.compilerArgs += '-parameters'
+}
+
+junit5 {
+    engines {
+        include 'junit5'
+    }
+    matchClassName '.*Test'
+}
 
 repositories {
     mavenCentral()
@@ -46,24 +60,26 @@ repositories {
             secretKey kaminoMavenSecretKey
         }
     }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 }
 
 dependencies {
     compile project(':rondel')
-    compile 'com.google.dagger:dagger:2.4'
-    compile 'com.squareup:javapoet:1.5.1'
+    compile 'com.google.dagger:dagger:2.5'
+    compile 'com.squareup:javapoet:1.7.0'
     compile 'com.google.guava:guava:19.0'
     compile 'com.google.auto:auto-common:0.6'
     compile 'com.google.android:android:4.1.1.4'
 
+    apt 'com.google.dagger:dagger-compiler:2.5'
 
-    apt 'com.google.dagger:dagger-compiler:2.4'
-
-    testCompile 'junit:junit:4.11'
+    testCompile "org.junit:junit5-api:5.0.0-SNAPSHOT"
     testCompile 'com.google.truth:truth:0.28'
-    testCompile 'com.google.testing.compile:compile-testing:0.8'
+    testCompile 'com.google.testing.compile:compile-testing:0.9'
     testCompile files(org.gradle.internal.jvm.Jvm.current().getToolsJar())
-    testCompile 'com.google.dagger:dagger-compiler:2.4'
+    testCompile 'com.google.dagger:dagger-compiler:2.5'
+
+    testRuntime "org.junit:junit5-engine:5.0.0-SNAPSHOT"
 }
 
 jacocoTestReport {

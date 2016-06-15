@@ -18,25 +18,36 @@ package solar.blaz.rondel.compiler.manager;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.squareup.javapoet.*;
-import solar.blaz.rondel.App;
-import solar.blaz.rondel.BaseAppComponent;
-import solar.blaz.rondel.compiler.Constants;
-import solar.blaz.rondel.compiler.model.ComponentModel;
-import solar.blaz.rondel.compiler.model.InjectorModel;
+import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.RoundEnvironment;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.lang.model.element.*;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+
+import solar.blaz.rondel.App;
+import solar.blaz.rondel.BaseAppComponent;
+import solar.blaz.rondel.compiler.Constants;
+import solar.blaz.rondel.compiler.model.ComponentModel;
+import solar.blaz.rondel.compiler.model.InjectorModel;
 
 import static com.google.auto.common.MoreElements.getAnnotationMirror;
 
