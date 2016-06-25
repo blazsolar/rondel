@@ -129,6 +129,27 @@ public abstract class AbstractInjectorManager {
 
     }
 
+    protected TypeElement verifyScope(TypeMirror scopeClass) {
+
+        TypeElement voidElement = elementUtils.getTypeElement(Void.class.getCanonicalName());
+
+        if (scopeClass == null || typesUtil.isSubtype(scopeClass, voidElement.asType())) {
+            return null; // no scope defined
+        } else {
+
+            // verify that is is provider
+            TypeElement scopeElement = elementUtils.getTypeElement(scopeClass.toString());
+            if (scopeElement.getKind() == ElementKind.ANNOTATION_TYPE) {
+                return scopeElement;
+            } else {
+                messager.error("Scope has to bo an annotation");
+                return null;
+            }
+
+        }
+
+    }
+
     protected TypeElement[] parseModuleElements(ImmutableList<TypeMirror> modules) {
         if (modules == null || modules.size() == 0) {
             return null;
@@ -296,7 +317,7 @@ public abstract class AbstractInjectorManager {
 
         if (children != null && children.size() > 0) {
 
-            List<MethodSpec> methods = new ArrayList<MethodSpec>(children.size());
+            List<MethodSpec> methods = new ArrayList<>(children.size());
 
             for (ComponentModel child : children) {
 

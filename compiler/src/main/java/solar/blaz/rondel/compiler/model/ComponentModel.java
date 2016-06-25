@@ -32,6 +32,7 @@ public class ComponentModel {
     public TypeElement[] components;
     public Element element;
     public TypeMirror parent;
+    public TypeElement scope;
 
     public InjectorModel injector;
 

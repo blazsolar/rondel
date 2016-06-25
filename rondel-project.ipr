@@ -57,6 +57,8 @@
     <modules>
       <module filepath="$PROJECT_DIR$/rondel-project.iml" fileurl="file://$PROJECT_DIR$/rondel-project.iml"/>
       <module filepath="$PROJECT_DIR$/compiler/rondel-compiler.iml" fileurl="file://$PROJECT_DIR$/compiler/rondel-compiler.iml"/>
+      <module filepath="$PROJECT_DIR$/test/rondel-test.iml" fileurl="file://$PROJECT_DIR$/test/rondel-test.iml"/>
+      <module filepath="$PROJECT_DIR$/testCompiler/rondel-test-compiler.iml" fileurl="file://$PROJECT_DIR$/testCompiler/rondel-test-compiler.iml"/>
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" assert-keyword="true" jdk-15="true" project-jdk-type="JavaSDK" assert-jdk-15="true" project-jdk-name="1.8">

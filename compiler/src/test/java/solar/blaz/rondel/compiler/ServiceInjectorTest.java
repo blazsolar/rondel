@@ -19,7 +19,7 @@ package solar.blaz.rondel.compiler;
 import com.google.common.collect.ImmutableList;
 import com.google.testing.compile.JavaFileObjects;
 
-import org.junit.gen5.api.Test;
+import org.junit.Test;
 
 import javax.tools.JavaFileObject;
 
@@ -160,12 +160,12 @@ public class ServiceInjectorTest {
                 "\n" +
                 "import dagger.Subcomponent;\n" +
                 "import solar.blaz.rondel.BaseComponent;\n" +
-                "import solar.blaz.rondel.ViewScope;\n" +
+                "import solar.blaz.rondel.ServiceScope;\n" +
                 "\n" +
                 "@Subcomponent(\n" +
                 "        modules = { TestModule.class }\n" +
                 ")\n" +
-                "@ViewScope\n" +
+                "@ServiceScope\n" +
                 "public interface RondelTestServiceComponent extends BaseComponent, TestComponent {\n" +
                 "    \n" +
                 "    void inject(TestService view);\n" +

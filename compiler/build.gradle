@@ -33,26 +33,11 @@ apply plugin: 'maven-publish'
 apply plugin: "jacoco"
 apply plugin: 'idea'
 apply plugin: "net.ltgt.apt"
-apply plugin: 'org.junit.gen5.gradle'
 
 sourceCompatibility = 1.8
 
-compileTestJava {
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
-    options.compilerArgs += '-parameters'
-}
-
-junit5 {
-    engines {
-        include 'junit5'
-    }
-    matchClassName '.*Test'
-}
-
 repositories {
     mavenCentral()
-    mavenLocal()
     maven {
         url "s3://kamino-maven/lib-release"
         credentials(AwsCredentials) {
@@ -73,13 +58,12 @@ dependencies {
 
     apt 'com.google.dagger:dagger-compiler:2.5'
 
-    testCompile "org.junit:junit5-api:5.0.0-SNAPSHOT"
+    testCompile 'junit:junit:4.12'
     testCompile 'com.google.truth:truth:0.28'
     testCompile 'com.google.testing.compile:compile-testing:0.9'
     testCompile files(org.gradle.internal.jvm.Jvm.current().getToolsJar())
     testCompile 'com.google.dagger:dagger-compiler:2.5'
 
-    testRuntime "org.junit:junit5-engine:5.0.0-SNAPSHOT"
 }
 
 jacocoTestReport {

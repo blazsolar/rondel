@@ -1,4 +1,4 @@
-package solar.blaz.rondel.mock.compiler;
+package solar.blaz.rondel.test.compiler;
 
 import com.google.common.collect.ImmutableSet;
 import com.squareup.javapoet.*;
@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
@@ -19,9 +20,17 @@ import solar.blaz.rondel.App;
 /**
  * Created by blaz on 09/06/16.
  */
-public class RondelMockProcessor extends AbstractProcessor {
+public class RondelTestProcessor extends AbstractProcessor {
+
+    @Override public synchronized void init(ProcessingEnvironment processingEnv) {
+        super.init(processingEnv);
+
+        System.out.println("Initing processor");
+    }
 
     @Override public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+
+        System.out.println("process call");
 
         Set<? extends Element> apps = roundEnv.getElementsAnnotatedWith(App.class);
 
@@ -30,16 +39,20 @@ public class RondelMockProcessor extends AbstractProcessor {
             for (Element app : apps) {
 
                 String packageName = processingEnv.getElementUtils().getPackageOf(app).getQualifiedName().toString();
+                ClassName rondelApp = ClassName.get(packageName, "Rondel" + app.getSimpleName());
                 ClassName appComponent = ClassName.get(packageName, "Rondel" + app.getSimpleName() + "Component");
-                TypeSpec.Builder builder = TypeSpec.classBuilder("Mock" + app.getSimpleName())
+                TypeSpec.Builder builder = TypeSpec.classBuilder("Test" + app.getSimpleName())
                         .superclass(TypeName.get(app.asType()))
+                        .addModifiers(Modifier.PUBLIC)
                         .addField(FieldSpec.builder(appComponent, "component", Modifier.PRIVATE)
                                 .build())
                         .addMethod(MethodSpec.methodBuilder("reInject")
-                                .addCode("component = $T.inject(this);", appComponent)
+                                .addCode("component = $T.inject(this);", rondelApp)
+                                .addModifiers(Modifier.PUBLIC)
                                 .build())
                         .addMethod(MethodSpec.methodBuilder("getComponent")
                                 .addAnnotation(ClassName.get(Override.class))
+                                .returns(appComponent)
                                 .addModifiers(Modifier.PUBLIC)
                                 .addCode(CodeBlock.builder()
                                         .add("if (component != null) {\n")
@@ -63,12 +76,12 @@ public class RondelMockProcessor extends AbstractProcessor {
             }
 
         } else if (apps.size() == 0) {
-            processingEnv.getMessager().printMessage(Kind.ERROR, "No App level view provided.");
+            processingEnv.getMessager().printMessage(Kind.WARNING, "No App level view provided.");
         } else {
-            processingEnv.getMessager().printMessage(Kind.ERROR, "Only one App level view is allowed.");
+            processingEnv.getMessager().printMessage(Kind.WARNING, "Only one App level view is allowed.");
         }
 
-        return true;
+        return false;
     }
 
     @Override public SourceVersion getSupportedSourceVersion() {

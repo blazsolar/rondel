@@ -18,12 +18,11 @@ package solar.blaz.rondel.compiler;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.LinkedListMultimap;
-import solar.blaz.rondel.App;
-import solar.blaz.rondel.Rondel;
-import solar.blaz.rondel.compiler.manager.Messager;
-import solar.blaz.rondel.compiler.manager.SingletonInjectorManager;
-import solar.blaz.rondel.compiler.manager.ViewInjectorManager;
-import solar.blaz.rondel.compiler.model.ComponentModel;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -33,10 +32,13 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Types;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+
+import solar.blaz.rondel.App;
+import solar.blaz.rondel.Rondel;
+import solar.blaz.rondel.compiler.manager.Messager;
+import solar.blaz.rondel.compiler.manager.SingletonInjectorManager;
+import solar.blaz.rondel.compiler.manager.ViewInjectorManager;
+import solar.blaz.rondel.compiler.model.ComponentModel;
 
 /**
  * Created by blazsolar on 24/02/16.
@@ -108,7 +110,7 @@ public class RondelProcessor extends AbstractProcessor {
 
         }
 
-        return true;
+        return false;
     }
 
     @Override

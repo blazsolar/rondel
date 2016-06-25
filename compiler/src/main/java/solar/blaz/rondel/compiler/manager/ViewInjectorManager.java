@@ -20,25 +20,39 @@ import android.app.Activity;
 import android.app.Application;
 import android.app.Service;
 import android.view.View;
-import com.google.common.collect.ImmutableList;
-import com.squareup.javapoet.*;
-import solar.blaz.rondel.BaseComponent;
-import solar.blaz.rondel.Rondel;
-import solar.blaz.rondel.ViewScope;
-import solar.blaz.rondel.compiler.Constants;
-import solar.blaz.rondel.compiler.model.ComponentModel;
-import solar.blaz.rondel.compiler.model.InjectorModel;
+
+import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.processing.Filer;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.lang.model.element.*;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.PackageElement;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+
+import solar.blaz.rondel.ActivityScope;
+import solar.blaz.rondel.BaseComponent;
+import solar.blaz.rondel.Rondel;
+import solar.blaz.rondel.ServiceScope;
+import solar.blaz.rondel.ViewScope;
+import solar.blaz.rondel.compiler.Constants;
+import solar.blaz.rondel.compiler.model.ComponentModel;
+import solar.blaz.rondel.compiler.model.InjectorModel;
 
 import static com.google.auto.common.MoreElements.getAnnotationMirror;
 
@@ -53,6 +67,10 @@ public class ViewInjectorManager extends AbstractInjectorManager {
     private final Types typesUtil;
     private final Messager messager;
 
+    TypeElement activityElement;
+    TypeElement serviceElement;
+    TypeElement viewElement;
+
     @Inject
     protected ViewInjectorManager(Messager messager, Elements elementUtils, Filer filer, Elements elementsUtil, Types typesUtil) {
         super(messager, elementUtils, typesUtil);
@@ -60,6 +78,10 @@ public class ViewInjectorManager extends AbstractInjectorManager {
         this.filer = filer;
         this.elementsUtil = elementsUtil;
         this.typesUtil = typesUtil;
+
+        activityElement = elementsUtil.getTypeElement(Activity.class.getCanonicalName());
+        serviceElement = elementsUtil.getTypeElement(Service.class.getCanonicalName());
+        viewElement = elementsUtil.getTypeElement(View.class.getCanonicalName());
     }
 
     public ComponentModel parse(Element element) {
@@ -74,6 +96,7 @@ public class ViewInjectorManager extends AbstractInjectorManager {
         TypeElement[] moduleElements = parseModuleElements(convertClassArrayToListOfTypes(annotationMirror, "modules"));
 
         TypeMirror parent = verifyParent(element, convertClassToType(annotationMirror, "parent"));
+        TypeElement scope = verifyScope(convertClassToType(annotationMirror, "scope"));
 
         InjectorModel injectorModel = new InjectorModel(element);
         injectorModel.name = Constants.CLASS_PREFIX + element.getSimpleName();
@@ -89,6 +112,7 @@ public class ViewInjectorManager extends AbstractInjectorManager {
         componentModel.modules = moduleElements;
         componentModel.components = components;
         componentModel.parent = parent;
+        componentModel.scope = scope;
         componentModel.injector = injectorModel;
         injectorModel.component = componentModel;
 
@@ -118,7 +142,6 @@ public class ViewInjectorManager extends AbstractInjectorManager {
 
         TypeSpec.Builder builder = TypeSpec.interfaceBuilder(model.name)
                 .addAnnotation(subcomponentAnnotation.build())
-                .addAnnotation(ViewScope.class)
                 .addModifiers(Modifier.PUBLIC)
                 .addSuperinterface(ClassName.get(BaseComponent.class))
                 .addType(getComponentBuilder(model))
@@ -127,6 +150,27 @@ public class ViewInjectorManager extends AbstractInjectorManager {
                         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                         .addParameter(TypeName.get(model.view), "view")
                         .build());
+
+        if (model.scope == null) {
+
+            TypeMirror elementType = model.element.asType();
+            boolean isActivity = isActivity(elementType);
+            boolean isService = isService(elementType);
+            boolean isView = isView(elementType);
+
+            if (isActivity) {
+                builder.addAnnotation(ActivityScope.class);
+            } else if (isService) {
+                builder.addAnnotation(ServiceScope.class);
+            } else if (isView) {
+                builder.addAnnotation(ViewScope.class);
+            } else {
+                messager.error("Scope for type could not be found");
+            }
+
+        } else {
+            builder.addAnnotation(ClassName.get(model.scope));
+        }
 
         if (model.components != null && model.components.length > 0) {
             for (TypeElement component : model.components) {
@@ -312,4 +356,15 @@ public class ViewInjectorManager extends AbstractInjectorManager {
 
     }
 
+    private boolean isActivity(TypeMirror childType) {
+        return typesUtil.isSubtype(childType, activityElement.asType());
+    }
+
+    private boolean isService(TypeMirror childType) {
+        return typesUtil.isSubtype(childType, serviceElement.asType());
+    }
+
+    private boolean isView(TypeMirror childType) {
+        return typesUtil.isSubtype(childType, viewElement.asType());
+    }
 }

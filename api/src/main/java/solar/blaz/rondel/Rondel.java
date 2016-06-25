@@ -34,4 +34,6 @@ public @interface Rondel {
 
     Class<?> parent() default Void.class;
 
+    Class<?> scope() default Void.class;
+
 }

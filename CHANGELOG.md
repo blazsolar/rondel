@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3 *(?)*
+ * Added ActivityScope and ServiceScope that are applied to correct super type.
+ * View level injection can now specify custom scope.
+
 ## 0.1.1 *(?)*
  * Adding support for overriding components and modules for Activities
  * Parent is no longer required for views. App component will be used as default.

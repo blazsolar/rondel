@@ -19,7 +19,7 @@ package solar.blaz.rondel.compiler;
 import com.google.common.collect.ImmutableList;
 import com.google.testing.compile.JavaFileObjects;
 
-import org.junit.gen5.api.Test;
+import org.junit.Test;
 
 import javax.tools.JavaFileObject;
 
