@@ -19,6 +19,8 @@ package solar.blaz.rondel.mock;
 import android.app.Application;
 import android.content.Context;
 import android.support.test.runner.AndroidJUnitRunner;
+import android.view.View;
+import android.view.ViewParent;
 
 import java.lang.reflect.Field;
 
@@ -56,6 +58,19 @@ public class RondelTestRunner extends AndroidJUnitRunner {
             return mockClassName;
         } else {
             return originalName;
+        }
+    }
+
+    private static View getParrent(View view) {
+        if (view instanceof View) {
+            return view;
+        } else {
+            ViewParent parent = view.getParent();
+            if (parent == null) {
+                throw new IllegalStateException("Parent not found");
+            } else{
+                return getParrent(view);
+            }
         }
     }
 

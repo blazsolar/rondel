@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.app.Service;
 import android.view.View;
+import android.view.ViewParent;
 
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
@@ -67,9 +68,10 @@ public class ViewInjectorManager extends AbstractInjectorManager {
     private final Types typesUtil;
     private final Messager messager;
 
-    TypeElement activityElement;
-    TypeElement serviceElement;
-    TypeElement viewElement;
+    private final TypeElement appElement;
+    private final TypeElement activityElement;
+    private final TypeElement serviceElement;
+    private final TypeElement viewElement;
 
     @Inject
     protected ViewInjectorManager(Messager messager, Elements elementUtils, Filer filer, Elements elementsUtil, Types typesUtil) {
@@ -79,9 +81,11 @@ public class ViewInjectorManager extends AbstractInjectorManager {
         this.elementsUtil = elementsUtil;
         this.typesUtil = typesUtil;
 
+        appElement = elementsUtil.getTypeElement(Application.class.getCanonicalName());
         activityElement = elementsUtil.getTypeElement(Activity.class.getCanonicalName());
         serviceElement = elementsUtil.getTypeElement(Service.class.getCanonicalName());
         viewElement = elementsUtil.getTypeElement(View.class.getCanonicalName());
+
     }
 
     public ComponentModel parse(Element element) {
@@ -242,44 +246,41 @@ public class ViewInjectorManager extends AbstractInjectorManager {
         String builderMethodName = Character.toLowerCase(name.charAt(0)) + name.substring(1) + "Builder";
         ClassName component =  ClassName.get(model.packageName, name);
 
-        TypeElement typeElement = elementsUtil.getTypeElement(Activity.class.getCanonicalName());
-        boolean isActivity = typesUtil.isSubtype(model.superType, typeElement.asType());
-        TypeElement serviceElement = elementsUtil.getTypeElement(Service.class.getCanonicalName());
-        boolean isService = typesUtil.isSubtype(model.superType, serviceElement.asType());
-        TypeElement viewElement = elementsUtil.getTypeElement(View.class.getCanonicalName());
-        boolean isView = typesUtil.isSubtype(model.superType, viewElement.asType());
+        boolean isActivity = isActivity(model.superType);
+        boolean isService = isService(model.superType);
+        boolean isView = isView(model.superType);
 
-        ClassName appClass = (ClassName) ClassName.get(parent.element.asType());
-        ClassName appComponentClass = ClassName.get(parent.packageName, parent.name);
+        ClassName parentClass = (ClassName) ClassName.get(parent.element.asType());
+        ClassName parentComponentClass = ClassName.get(parent.packageName, parent.name);
 
         CodeBlock injectLogic;
 
         if (isActivity || isService) {
 
-            injector.addField(appComponentClass, "component", Modifier.PRIVATE, Modifier.STATIC);
+            injector.addField(parentComponentClass, "component", Modifier.PRIVATE, Modifier.STATIC);
 
             injector.addMethod(MethodSpec.methodBuilder("getComponent")
                     .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
-                    .returns(appComponentClass)
-                    .addParameter(appClass, "app")
+                    .returns(parentComponentClass)
+                    .addParameter(parentClass, "app")
                     .addCode(CodeBlock.builder()
                             .add("if (component != null) {")
                             .add("return component;")
                             .add("} else {")
-                            .add("return ($T) app.getComponent();", appComponentClass)
+                            .add("return ($T) app.getComponent();", parentComponentClass)
                             .add("}")
                             .build())
                     .build());
 
             injector.addMethod(MethodSpec.methodBuilder("setComponent")
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .addParameter(appComponentClass, "component")
+                    .addParameter(parentComponentClass, "component")
                     .addCode("$L.component = component;", model.name)
                     .build());
 
             List<Object> formatParams = new ArrayList<>();
-            formatParams.add(appClass);
-            formatParams.add(appClass);
+            formatParams.add(parentClass);
+            formatParams.add(parentClass);
             formatParams.add(component);
             formatParams.add(builderMethodName);
 
@@ -299,21 +300,41 @@ public class ViewInjectorManager extends AbstractInjectorManager {
         } else if (isView) {
 
             List<Object> formatParams = new ArrayList<>();
-            formatParams.add(appClass);
-            formatParams.add(appClass);
-            formatParams.add(appComponentClass);
-            formatParams.add(appComponentClass);
+            formatParams.add(parentClass);
+            formatParams.add(parentClass);
+            formatParams.add(parentComponentClass);
+            formatParams.add(parentComponentClass);
             formatParams.add(component);
             formatParams.add(builderMethodName);
 
-            TypeElement appElement = elementsUtil.getTypeElement(Application.class.getCanonicalName());
-            boolean isApp = typesUtil.isSubtype(parent.element.asType(), appElement.asType());
+            boolean isParentApp = isApplication(parent.element.asType());
+            boolean isParentActivity = isActivity(parent.element.asType());
+            boolean isParentView = isView(parent.element.asType());
 
             StringBuilder formatBuilder = new StringBuilder();
-            if (isApp) {
+            if (isParentApp) {
                 formatBuilder.append("$T parent = ($T) injectie.getContext().getApplicationContext();\n");
-            } else {
+            } else if (isParentActivity) {
                 formatBuilder.append("$T parent = ($T) injectie.getContext();\n");
+            } else if (isParentView) {
+                formatBuilder.append("$T parent = ($T) getParent(injectie.getParent());\n");
+                injector.addMethod(MethodSpec.methodBuilder("getParent")
+                        .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
+                        .addParameter(ViewParent.class, "view")
+                        .returns(parentClass)
+                        .addCode(CodeBlock.of("if (view instanceof $T) {\n"
+                                + "    return ($T) view;\n"
+                                + "} else {\n"
+                                + "    ViewParent parent = view.getParent();\n"
+                                + "    if (parent == null) {\n"
+                                + "        throw new IllegalStateException(\"Parent not found\");\n"
+                                + "    } else {\n"
+                                + "        return getParent(parent);\n"
+                                + "    }\n"
+                                + "}\n", parentClass, parentClass))
+                        .build());
+            } else {
+                messager.error("Unknown parent type");
             }
 
             formatBuilder.append("$T baseComponent = ($T) parent.getComponent();\n" +
@@ -354,6 +375,10 @@ public class ViewInjectorManager extends AbstractInjectorManager {
                 typesUtil.isSubtype(element.asType(), serviceElement.asType()) ||
                 typesUtil.isSubtype(element.asType(), viewElement.asType());
 
+    }
+
+    private boolean isApplication(TypeMirror childType) {
+        return typesUtil.isSubtype(childType, appElement.asType());
     }
 
     private boolean isActivity(TypeMirror childType) {
