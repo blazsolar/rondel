@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0 *(?)*
+## 0.2.0 *(26.6.2016)*
  * Added ActivityScope and ServiceScope that are applied to correct super type.
  * View level injection can now specify custom scope.
  * Added support for nested views.
