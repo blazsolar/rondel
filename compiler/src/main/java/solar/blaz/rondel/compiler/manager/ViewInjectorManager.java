@@ -145,6 +145,7 @@ public class ViewInjectorManager extends AbstractInjectorManager {
         }
 
         TypeSpec.Builder builder = TypeSpec.interfaceBuilder(model.name)
+                .addAnnotation(getGeneratedAnnotation())
                 .addAnnotation(subcomponentAnnotation.build())
                 .addModifiers(Modifier.PUBLIC)
                 .addSuperinterface(ClassName.get(BaseComponent.class))
@@ -228,7 +229,8 @@ public class ViewInjectorManager extends AbstractInjectorManager {
 
     private void writeInjector(InjectorModel model, ComponentModel parent) throws IOException {
 
-        TypeSpec.Builder injector = TypeSpec.classBuilder(model.name);
+        TypeSpec.Builder injector = TypeSpec.classBuilder(model.name)
+                .addAnnotation(getGeneratedAnnotation());
 
         addInjectMethods(model, parent, injector);
         addTestSpecs(model.modules, injector, model.view);

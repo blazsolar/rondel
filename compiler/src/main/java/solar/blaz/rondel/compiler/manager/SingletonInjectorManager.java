@@ -171,6 +171,7 @@ public class SingletonInjectorManager extends AbstractInjectorManager {
         }
 
         TypeSpec.Builder builder = TypeSpec.interfaceBuilder(model.name)
+                .addAnnotation(getGeneratedAnnotation())
                 .addAnnotation(componentAnnotation.build())
                 .addAnnotation(ClassName.get("javax.inject", "Singleton"))
                 .addModifiers(Modifier.PUBLIC)
@@ -210,6 +211,7 @@ public class SingletonInjectorManager extends AbstractInjectorManager {
                 .build();
 
         TypeSpec.Builder injector = TypeSpec.classBuilder(model.name)
+                .addAnnotation(getGeneratedAnnotation())
                 .addModifiers(Modifier.PUBLIC)
                 .addMethod(MethodSpec.methodBuilder("inject")
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)

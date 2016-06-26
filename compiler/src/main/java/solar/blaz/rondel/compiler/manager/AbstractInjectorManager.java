@@ -23,6 +23,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.Generated;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.AnnotationValueVisitor;
@@ -336,6 +338,14 @@ public abstract class AbstractInjectorManager {
             return Collections.emptyList();
         }
 
+    }
+
+
+    protected AnnotationSpec getGeneratedAnnotation() {
+        return AnnotationSpec.builder(Generated.class)
+                .addMember("value", "\"solar.blaz.rondel.compiler.RondelProcessor\"")
+                .addMember("comments", "\"http://blaz.solar/rondel/\"")
+                .build();
     }
 
     private static final AnnotationValueVisitor<ImmutableList<TypeMirror>, String> TO_LIST_OF_TYPES =

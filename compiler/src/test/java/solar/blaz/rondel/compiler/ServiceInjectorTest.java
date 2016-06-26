@@ -111,72 +111,83 @@ public class ServiceInjectorTest {
                 "    }\n" +
                 "}");
 
-        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.service.RondelTestService", "package test.service;\n" +
-                "\n" +
-                "import test.RondelTestAppComponent;\n" +
-                "import test.TestApp;\n" +
-                "\n" +
-                "class RondelTestService {\n" +
-                "    \n" +
-                "    private static RondelTestAppComponent component;\n" +
-                "    private static TestModule testModule;\n" +
-                "\n" +
-                "    private static RondelTestAppComponent getComponent(TestApp app) {\n" +
-                "        if (component != null) {\n" +
-                "            return component;\n" +
-                "        } else {\n" +
-                "            return (RondelTestAppComponent) app.getComponent();\n" +
-                "        }\n" +
-                "    }\n" +
-                "    \n" +
-                "    public static void setComponent(RondelTestAppComponent component) {\n" +
-                "        RondelTestService.component = component;\n" +
-                "    }\n" +
-                "    \n" +
-                "    public static RondelTestServiceComponent inject(TestService injectie) {\n" +
-                "        TestApp app = (TestApp) injectie.getApplicationContext();\n" +
-                "        RondelTestServiceComponent component = getComponent(app).rondelTestServiceComponentBuilder()\n" +
-                "                .testModule(getTestModule(injectie))\n" +
-                "                .build();\n" +
-                "        component.inject(injectie);\n" +
-                "        return component;\n" +
-                "    }\n" +
-                "    \n" +
-                "    public static void setTestModule(TestModule module) {\n" +
-                "        testModule = module;\n" +
-                "    }\n" +
-                "    \n" +
-                "    private static TestModule getTestModule(TestService injectie) {\n" +
-                "        if (testModule != null) {\n" +
-                "            return testModule;\n" +
-                "        } else {\n" +
-                "            return new TestModule();\n" +
-                "        }\n" +
-                "    }\n" +
-                "    \n" +
-                "}");
+        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.service.RondelTestService", "package test.service;\n"
+                + "\n"
+                + "import javax.annotation.Generated;\n"
+                + "\n"
+                + "import test.RondelTestAppComponent;\n"
+                + "import test.TestApp;\n"
+                + "\n"
+                + "@Generated(\n"
+                + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
+                + "        comments = \"http://blaz.solar/rondel/\"\n"
+                + ")\n"
+                + "class RondelTestService {\n"
+                + "    \n"
+                + "    private static RondelTestAppComponent component;\n"
+                + "    private static TestModule testModule;\n"
+                + "\n"
+                + "    private static RondelTestAppComponent getComponent(TestApp app) {\n"
+                + "        if (component != null) {\n"
+                + "            return component;\n"
+                + "        } else {\n"
+                + "            return (RondelTestAppComponent) app.getComponent();\n"
+                + "        }\n"
+                + "    }\n"
+                + "    \n"
+                + "    public static void setComponent(RondelTestAppComponent component) {\n"
+                + "        RondelTestService.component = component;\n"
+                + "    }\n"
+                + "    \n"
+                + "    public static RondelTestServiceComponent inject(TestService injectie) {\n"
+                + "        TestApp app = (TestApp) injectie.getApplicationContext();\n"
+                + "        RondelTestServiceComponent component = getComponent(app).rondelTestServiceComponentBuilder()\n"
+                + "                .testModule(getTestModule(injectie))\n"
+                + "                .build();\n"
+                + "        component.inject(injectie);\n"
+                + "        return component;\n"
+                + "    }\n"
+                + "    \n"
+                + "    public static void setTestModule(TestModule module) {\n"
+                + "        testModule = module;\n"
+                + "    }\n"
+                + "    \n"
+                + "    private static TestModule getTestModule(TestService injectie) {\n"
+                + "        if (testModule != null) {\n"
+                + "            return testModule;\n"
+                + "        } else {\n"
+                + "            return new TestModule();\n"
+                + "        }\n"
+                + "    }\n"
+                + "    \n"
+                + "}");
 
-        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.service.RondelTestServiceComponent", "package test.service;\n" +
-                "\n" +
-                "import dagger.Subcomponent;\n" +
-                "import solar.blaz.rondel.BaseComponent;\n" +
-                "import solar.blaz.rondel.ServiceScope;\n" +
-                "\n" +
-                "@Subcomponent(\n" +
-                "        modules = { TestModule.class }\n" +
-                ")\n" +
-                "@ServiceScope\n" +
-                "public interface RondelTestServiceComponent extends BaseComponent, TestComponent {\n" +
-                "    \n" +
-                "    void inject(TestService view);\n" +
-                "\n" +
-                "    @Subcomponent.Builder\n" +
-                "    interface Builder {\n" +
-                "        Builder testModule(TestModule module);\n" +
-                "        RondelTestServiceComponent build();\n" +
-                "    }\n" +
-                "    \n" +
-                "}");
+        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.service.RondelTestServiceComponent", "package test.service;\n"
+                + "\n"
+                + "import dagger.Subcomponent;\n"
+                + "import javax.annotation.Generated;\n"
+                + "import solar.blaz.rondel.BaseComponent;\n"
+                + "import solar.blaz.rondel.ServiceScope;\n"
+                + "\n"
+                + "@Generated(\n"
+                + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
+                + "        comments = \"http://blaz.solar/rondel/\"\n"
+                + ")\n"
+                + "@Subcomponent(\n"
+                + "        modules = { TestModule.class }\n"
+                + ")\n"
+                + "@ServiceScope\n"
+                + "public interface RondelTestServiceComponent extends BaseComponent, TestComponent {\n"
+                + "    \n"
+                + "    void inject(TestService view);\n"
+                + "\n"
+                + "    @Subcomponent.Builder\n"
+                + "    interface Builder {\n"
+                + "        Builder testModule(TestModule module);\n"
+                + "        RondelTestServiceComponent build();\n"
+                + "    }\n"
+                + "    \n"
+                + "}");
 
         assertAbout(javaSources())
                 .that(ImmutableList.of(appFile, moduleFile, componentFile, activityFile, activityModuleFile, activityComponentFile))

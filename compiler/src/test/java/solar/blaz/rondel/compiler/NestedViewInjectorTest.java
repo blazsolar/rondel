@@ -176,9 +176,16 @@ public class NestedViewInjectorTest {
         JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.ui.view.sub.RondelTestSubView", "package test.ui.view.sub;\n"
                 + "\n"
                 + "import android.view.ViewParent;\n"
+                + "\n"
+                + "import javax.annotation.Generated;\n"
+                + "\n"
                 + "import test.ui.view.RondelTestViewComponent;\n"
                 + "import test.ui.view.TestView;\n"
                 + "\n"
+                + "@Generated(\n"
+                + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
+                + "        comments = \"http://blaz.solar/rondel/\"\n"
+                + ")\n"
                 + "class RondelTestSubView {\n"
                 + "    \n"
                 + "    private static TestView getParent(ViewParent view) {\n"
@@ -205,25 +212,29 @@ public class NestedViewInjectorTest {
                 + "    \n"
                 + "}");
 
-        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.ui.view.sub.RondelSubTestViewComponent", "package test.ui.view.sub;\n" +
-                "\n" +
-                "import dagger.Subcomponent;\n" +
-                "import solar.blaz.rondel.BaseComponent;\n" +
-                "import solar.blaz.rondel.ViewScope;\n" +
-                "\n" +
-                "@Subcomponent(\n" +
-                ")\n" +
-                "@ViewScope\n" +
-                "public interface RondelTestSubViewComponent extends BaseComponent {\n" +
-                "    \n" +
-                "    void inject(TestSubView view);\n" +
-                "    \n" +
-                "    @Subcomponent.Builder\n" +
-                "    interface Builder {\n" +
-                "        RondelTestSubViewComponent build();\n" +
-                "    }\n" +
-                "    \n" +
-                "}");
+        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.ui.view.sub.RondelSubTestViewComponent", "package test.ui.view.sub;\n"
+                + "\n"
+                + "import dagger.Subcomponent;\n"
+                + "import javax.annotation.Generated;\n"
+                + "import solar.blaz.rondel.BaseComponent;\n"
+                + "import solar.blaz.rondel.ViewScope;\n"
+                + "\n"
+                + "@Generated(\n"
+                + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
+                + "        comments = \"http://blaz.solar/rondel/\"\n"
+                + ")\n"
+                + "@Subcomponent\n"
+                + "@ViewScope\n"
+                + "public interface RondelTestSubViewComponent extends BaseComponent {\n"
+                + "    \n"
+                + "    void inject(TestSubView view);\n"
+                + "    \n"
+                + "    @Subcomponent.Builder\n"
+                + "    interface Builder {\n"
+                + "        RondelTestSubViewComponent build();\n"
+                + "    }\n"
+                + "    \n"
+                + "}");
 
         assertAbout(javaSources())
                 .that(ImmutableList.of(appFile, moduleFile, componentFile, activityFile, activityModuleFile,
