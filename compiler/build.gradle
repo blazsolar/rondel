@@ -61,8 +61,6 @@ dependencies {
     compile 'com.squareup:javapoet:1.7.0'
     compile 'com.google.guava:guava:19.0'
     compile 'com.google.auto:auto-common:0.6'
-    compile files("${sdkDir}/extras/android/support/v4/android-support-v4.jar")
-    compile files("${sdkDir}/platforms/android-24/android.jar")
 
     apt 'com.google.dagger:dagger-compiler:2.5'
 
@@ -71,6 +69,8 @@ dependencies {
     testCompile 'com.google.testing.compile:compile-testing:0.9'
     testCompile files(org.gradle.internal.jvm.Jvm.current().getToolsJar())
     testCompile 'com.google.dagger:dagger-compiler:2.5'
+    testCompile files("${sdkDir}/extras/android/support/v4/android-support-v4.jar")
+    testCompile files("${sdkDir}/platforms/android-24/android.jar")
 
 }
 

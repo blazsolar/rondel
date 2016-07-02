@@ -16,12 +16,6 @@
 
 package solar.blaz.rondel.compiler.manager;
 
-import android.app.Activity;
-import android.app.Application;
-import android.app.Fragment;
-import android.app.Service;
-import android.view.View;
-
 import com.google.auto.common.MoreElements;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -82,12 +76,12 @@ public abstract class AbstractInjectorManager {
         this.elementUtils = elementUtils;
         this.typesUtil = typesUtil;
 
-        appElement = elementUtils.getTypeElement(Application.class.getCanonicalName());
-        activityElement = elementUtils.getTypeElement(Activity.class.getCanonicalName());
-        serviceElement = elementUtils.getTypeElement(Service.class.getCanonicalName());
-        fragmentElement = elementUtils.getTypeElement(Fragment.class.getCanonicalName());
-        supportFragmentElement = elementUtils.getTypeElement(android.support.v4.app.Fragment.class.getCanonicalName());
-        viewElement = elementUtils.getTypeElement(View.class.getCanonicalName());
+        appElement = elementUtils.getTypeElement("android.app.Application");
+        activityElement = elementUtils.getTypeElement("android.app.Activity");
+        serviceElement = elementUtils.getTypeElement("android.app.Service");
+        fragmentElement = elementUtils.getTypeElement("android.app.Fragment");
+        supportFragmentElement = elementUtils.getTypeElement("android.support.v4.app.Fragment");
+        viewElement = elementUtils.getTypeElement("android.view.View");
         voidElement = elementUtils.getTypeElement(Void.class.getCanonicalName());
     }
 
@@ -393,7 +387,7 @@ public abstract class AbstractInjectorManager {
 
     protected boolean isFragment(TypeMirror childType) {
         return typesUtil.isSubtype(childType, fragmentElement.asType())
-                || typesUtil.isSubtype(childType, supportFragmentElement.asType());
+                || (supportFragmentElement != null && typesUtil.isSubtype(childType, supportFragmentElement.asType()));
     }
 
     protected boolean isView(TypeMirror childType) {

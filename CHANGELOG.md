@@ -4,6 +4,8 @@
  * Added support for Fragments.
  * Explicitly define Application as parent.
  * Rondel now works with Dagger 2.4 bindings.
+ * Removed Android SDK compile time dependency.
+ * Removed Support Library compile time dependency.
 
 ## 0.2.0 *(26.6.2016)*
  * Added ActivityScope and ServiceScope that are applied to correct super type.

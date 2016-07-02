@@ -16,8 +16,6 @@
 
 package solar.blaz.rondel.compiler.manager;
 
-import android.view.ViewParent;
-
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -43,9 +41,9 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import solar.blaz.rondel.ActivityScope;
-import solar.blaz.rondel.RondelComponent;
 import solar.blaz.rondel.FragmentScope;
 import solar.blaz.rondel.Rondel;
+import solar.blaz.rondel.RondelComponent;
 import solar.blaz.rondel.ServiceScope;
 import solar.blaz.rondel.ViewScope;
 import solar.blaz.rondel.compiler.Constants;
@@ -293,7 +291,7 @@ public class ViewInjectorManager extends AbstractInjectorManager {
                 formatBuilder.append("$T parent = ($T) getParent(injectie.getParent());\n");
                 injector.addMethod(MethodSpec.methodBuilder("getParent")
                         .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
-                        .addParameter(ViewParent.class, "view")
+                        .addParameter(ClassName.get("android.view", "ViewParent"), "view")
                         .returns(parentClass)
                         .addCode(CodeBlock.of("if (view instanceof $T) {\n"
                                 + "    return ($T) view;\n"
