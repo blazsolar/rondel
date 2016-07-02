@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0 *(?)*
+ * Added support for fragments.
+ * Explicitly define Application as parent.
+
 ## 0.2.0 *(26.6.2016)*
  * Added ActivityScope and ServiceScope that are applied to correct super type.
  * View level injection can now specify custom scope.
