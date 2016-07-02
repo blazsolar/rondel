@@ -75,6 +75,7 @@ public class ViewInjectorManager extends AbstractInjectorManager {
     public ComponentModel parse(Element element) {
 
         if (!isValidType(element)) {
+            messager.error("Element type not supported.", element);
             return null;
         }
 

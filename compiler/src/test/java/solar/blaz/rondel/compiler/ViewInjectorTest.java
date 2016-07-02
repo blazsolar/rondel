@@ -869,5 +869,40 @@ public class ViewInjectorTest {
 
     }
 
+    @Test
+    public void testInvalidType() throws Exception {
 
+        JavaFileObject appFile = JavaFileObjects.forSourceString("test.TestApp", "package test;\n" +
+                "\n" +
+                "import android.app.Application;\n" +
+                "import solar.blaz.rondel.App;\n" +
+                "import solar.blaz.rondel.ComponentProvider;\n" +
+                "\n" +
+                "@App\n" +
+                "public class TestApp extends Application implements ComponentProvider {\n" +
+                "    public RondelTestAppComponent getComponent() {\n" +
+                "        return null;\n" +
+                "    }\n" +
+                "}");
+
+        JavaFileObject activityFile = JavaFileObjects.forSourceString("test.ui.TestActivity", "package test.ui;\n" +
+                "\n" +
+                "import android.app.Activity;\n" +
+                "import solar.blaz.rondel.RondelComponent;\n" +
+                "import solar.blaz.rondel.ComponentProvider;\n" +
+                "import solar.blaz.rondel.Rondel;\n" +
+                "\n" +
+                "@Rondel\n" +
+                "public class TestActivity {\n" +
+                "\n" +
+                "}");
+
+        assertAbout(javaSources())
+                .that(ImmutableList.of(appFile, activityFile))
+                .processedWith(new RondelProcessor(), new ComponentProcessor())
+                .failsToCompile()
+                .withErrorContaining("Element type not supported.");
+
+
+    }
 }
