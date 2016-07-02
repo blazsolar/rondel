@@ -655,6 +655,82 @@ public class ViewInjectorTest {
     }
 
     @Test
+    public void testParentFragment() throws Exception {
+
+        JavaFileObject appFile = JavaFileObjects.forSourceString("test.TestApp", "package test;\n" +
+                "\n" +
+                "import android.app.Application;\n" +
+                "import solar.blaz.rondel.App;\n" +
+                "import solar.blaz.rondel.ComponentProvider;\n" +
+                "\n" +
+                "@App\n" +
+                "public class TestApp extends Application implements ComponentProvider {\n" +
+                "    public RondelTestAppComponent getComponent() {\n" +
+                "        return null;\n" +
+                "    }\n" +
+                "}");
+
+        JavaFileObject fragmentFile = JavaFileObjects.forSourceString("test.ui.fragment.TestFragment", "package test.ui.fragment;\n" +
+                "\n" +
+                "import android.app.Fragment;\n" +
+                "import solar.blaz.rondel.RondelComponent;\n" +
+                "import solar.blaz.rondel.ComponentProvider;\n" +
+                "import solar.blaz.rondel.Rondel;\n" +
+                "\n" +
+                "@Rondel\n" +
+                "public class TestFragment extends Fragment implements ComponentProvider {\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public RondelComponent getComponent() {\n" +
+                "        return null;\n" +
+                "    }\n" +
+                "}");
+
+        JavaFileObject viewModuleFile = JavaFileObjects.forSourceString("test.ui.view.TestViewModule", "package test.ui.view;\n" +
+                "\n" +
+                "import dagger.Module;\n" +
+                "\n" +
+                "@Module\n" +
+                "public class TestViewModule {\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject viewComponentFile = JavaFileObjects.forSourceString("test.ui.view.TestViewComponent", "package test.ui.view;\n" +
+                "\n" +
+                "import dagger.Component;\n" +
+                "\n" +
+                "@Component\n" +
+                "public interface TestViewComponent {\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject viewFile = JavaFileObjects.forSourceString("test.ui.view.TestView", "package test.ui.view;\n" +
+                "\n" +
+                "import android.content.Context;\n" +
+                "import android.util.AttributeSet;\n" +
+                "import android.view.View;\n" +
+                "import solar.blaz.rondel.Rondel;\n" +
+                "\n" +
+                "@Rondel(\n" +
+                "        components = TestViewComponent.class,\n" +
+                "        modules = TestViewModule.class,\n" +
+                "        parent = test.ui.fragment.TestFragment.class\n" +
+                ")\n" +
+                "public class TestView extends View {\n" +
+                "    public TestView(Context context, AttributeSet attrs) {\n" +
+                "        super(context, attrs);\n" +
+                "    }\n" +
+                "}");
+
+        assertAbout(javaSources())
+                .that(ImmutableList.of(appFile, fragmentFile, viewModuleFile, viewComponentFile, viewFile))
+                .processedWith(new RondelProcessor(), new ComponentProcessor())
+                .failsToCompile()
+                .withErrorContaining("Unknown parent type");
+
+    }
+
+    @Test
     public void testNoParams() throws Exception {
 
         JavaFileObject moduleFile = JavaFileObjects.forSourceString("test.AppModule", "package test;\n" +
