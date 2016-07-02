@@ -73,6 +73,7 @@ public abstract class AbstractInjectorManager {
     private final TypeElement activityElement;
     private final TypeElement serviceElement;
     private final TypeElement fragmentElement;
+    private final TypeElement supportFragmentElement;
     private final TypeElement viewElement;
     private final TypeElement voidElement;
 
@@ -85,6 +86,7 @@ public abstract class AbstractInjectorManager {
         activityElement = elementUtils.getTypeElement(Activity.class.getCanonicalName());
         serviceElement = elementUtils.getTypeElement(Service.class.getCanonicalName());
         fragmentElement = elementUtils.getTypeElement(Fragment.class.getCanonicalName());
+        supportFragmentElement = elementUtils.getTypeElement(android.support.v4.app.Fragment.class.getCanonicalName());
         viewElement = elementUtils.getTypeElement(View.class.getCanonicalName());
         voidElement = elementUtils.getTypeElement(Void.class.getCanonicalName());
     }
@@ -375,7 +377,8 @@ public abstract class AbstractInjectorManager {
     }
 
     protected boolean isFragment(TypeMirror childType) {
-        return typesUtil.isSubtype(childType, fragmentElement.asType());
+        return typesUtil.isSubtype(childType, fragmentElement.asType())
+                || typesUtil.isSubtype(childType, supportFragmentElement.asType());
     }
 
     protected boolean isView(TypeMirror childType) {

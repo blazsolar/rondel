@@ -60,7 +60,7 @@ dependencies {
     compile 'com.squareup:javapoet:1.7.0'
     compile 'com.google.guava:guava:19.0'
     compile 'com.google.auto:auto-common:0.6'
-    compile 'com.android.support:support-v4:24.0.0'
+    compile files("${sdkDir}/extras/android/support/v4/android-support-v4.jar")
     compile files("${sdkDir}/platforms/android-24/android.jar")
 
     apt 'com.google.dagger:dagger-compiler:2.5'
