@@ -212,6 +212,130 @@ public class FragmentInjectorTest {
     }
 
     @Test
+    public void testTestApplicationParent() throws Exception {
+
+        JavaFileObject appFile = JavaFileObjects.forSourceString("test.TestApp", "package test;\n"
+                + "\n"
+                + "import android.app.Application;\n"
+                + "import solar.blaz.rondel.App;\n"
+                + "import solar.blaz.rondel.ComponentProvider;\n"
+                + "\n"
+                + "@App\n"
+                + "public class TestApp extends Application implements ComponentProvider {\n"
+                + "    public RondelTestAppComponent getComponent() {\n"
+                + "        return null;\n"
+                + "    }\n"
+                + "}");
+
+        JavaFileObject fragmentModuleFile = JavaFileObjects.forSourceString("test.ui.fragment.TestFragmentModule", "package test.ui.fragment;\n" +
+                "\n" +
+                "import dagger.Module;\n" +
+                "\n" +
+                "@Module\n" +
+                "public class TestFragmentModule {\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject fragmentComponentFile = JavaFileObjects.forSourceString("test.ui.fragment.TestFragmentComponent", "package test.ui.fragment;\n" +
+                "\n" +
+                "import dagger.Component;\n" +
+                "\n" +
+                "@Component\n" +
+                "public interface TestFragmentComponent {\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject fragmentFile = JavaFileObjects.forSourceString("test.ui.fragment.TestFragment", "package test.ui.fragment;\n"
+                + "\n"
+                + "import android.app.Fragment;\n"
+                + "import solar.blaz.rondel.Rondel;\n"
+                + "import test.TestApp;\n"
+                + "\n"
+                + "@Rondel(\n"
+                + "        components = TestFragmentComponent.class,\n"
+                + "        modules = TestFragmentModule.class,\n"
+                + "        parent = test.TestApp.class\n"
+                + ")\n"
+                + "public class TestFragment extends Fragment {\n"
+                + "    \n"
+                + "}");
+
+        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.ui.fragment.RondelTestFragment", "package test.ui.fragment;\n"
+                + "\n"
+                + "import javax.annotation.Generated;\n"
+                + "\n"
+                + "import test.RondelTestAppComponent;\n"
+                + "import test.TestApp;\n"
+                + "\n"
+                + "@Generated(\n"
+                + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
+                + "        comments = \"http://blaz.solar/rondel/\"\n"
+                + ")\n"
+                + "class RondelTestFragment {\n"
+                + "    \n"
+                + "    private static TestFragmentModule testFragmentModule;\n"
+                + "    \n"
+                + "    public static RondelTestFragmentComponent inject(TestFragment injectie) {\n"
+                + "        TestApp parent = (TestApp) injectie.getActivity().getApplicationContext();\n"
+                + "        RondelTestAppComponent baseComponent = (RondelTestAppComponent) parent.getComponent();\n"
+                + "        RondelTestFragmentComponent component = baseComponent.rondelTestFragmentComponentBuilder()\n"
+                + "                .testFragmentModule(getTestFragmentModule(injectie))\n"
+                + "                .build();\n"
+                + "        component.inject(injectie);\n"
+                + "        return component;\n"
+                + "    }\n"
+                + "    \n"
+                + "    public static void setTestFragmentModule(TestFragmentModule module) {\n"
+                + "        testFragmentModule = module;\n"
+                + "    }\n"
+                + "    \n"
+                + "    private static TestFragmentModule getTestFragmentModule(TestFragment injectie) {\n"
+                + "        if (testFragmentModule != null) {\n"
+                + "            return testFragmentModule;\n"
+                + "        } else {\n"
+                + "            return new TestFragmentModule();\n"
+                + "        }\n"
+                + "    }\n"
+                + "    \n"
+                + "}");
+
+        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.ui.fragment.RondelTestFragmentComponent", "package test.ui.fragment;\n"
+                + "\n"
+                + "import dagger.Subcomponent;\n"
+                + "import javax.annotation.Generated;\n"
+                + "import solar.blaz.rondel.FragmentScope;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
+                + "\n"
+                + "@Generated(\n"
+                + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
+                + "        comments = \"http://blaz.solar/rondel/\"\n"
+                + ")\n"
+                + "@Subcomponent(\n"
+                + "        modules = { TestFragmentModule.class }\n"
+                + ")\n"
+                + "@FragmentScope\n"
+                + "public interface RondelTestFragmentComponent extends RondelComponent, TestFragmentComponent {\n"
+                + "    \n"
+                + "    void inject(TestFragment view);\n"
+                + "    \n"
+                + "    @Subcomponent.Builder\n"
+                + "    interface Builder {\n"
+                + "        Builder testFragmentModule(TestFragmentModule module);\n"
+                + "        RondelTestFragmentComponent build();\n"
+                + "    }\n"
+                + "    \n"
+                + "}");
+
+        assertAbout(javaSources())
+                .that(ImmutableList.of(appFile, fragmentModuleFile, fragmentComponentFile, fragmentFile))
+                .processedWith(new RondelProcessor(), new ComponentProcessor())
+                .compilesWithoutError()
+                .and()
+                .generatesSources(expectedInjector, expectedComponent);
+
+    }
+
+    @Test
     public void testTestActivityParent() throws Exception {
 
         JavaFileObject appFile = JavaFileObjects.forSourceString("test.TestApp", "package test;\n"

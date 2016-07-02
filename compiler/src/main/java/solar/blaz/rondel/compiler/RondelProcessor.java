@@ -88,7 +88,7 @@ public class RondelProcessor extends AbstractProcessor {
             }
 
             for (ComponentModel componentModel : componentModels) {
-                if (componentModel.parent == null) {
+                if (componentModel.parent == null || typesUtil.isSubtype(componentModel.parent, appComponent.element.asType())) {
                     components.put(appComponent, componentModel);
                 } else {
                     for (ComponentModel parent : componentModels) {

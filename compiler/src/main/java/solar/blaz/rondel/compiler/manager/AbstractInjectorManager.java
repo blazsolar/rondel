@@ -127,7 +127,7 @@ public abstract class AbstractInjectorManager {
         boolean isFragment = isFragment(element.asType());
 
         if (componentClass == null || isVoid(componentClass)) {
-            return null; // no parent
+            return null; // no parent (Default application)
         } else {
 
             // verify that is is provider

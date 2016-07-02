@@ -62,7 +62,6 @@ public class ViewInjectorManager extends AbstractInjectorManager {
 
     private final Filer filer;
     private final Elements elementsUtil;
-    private final Types typesUtil;
     private final Messager messager;
 
     @Inject
@@ -71,7 +70,6 @@ public class ViewInjectorManager extends AbstractInjectorManager {
         this.messager = messager;
         this.filer = filer;
         this.elementsUtil = elementsUtil;
-        this.typesUtil = typesUtil;
     }
 
     public ComponentModel parse(Element element) {
