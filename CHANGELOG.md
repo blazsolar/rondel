@@ -1,8 +1,9 @@
 # Changelog
 
 ## 1.0.0 *(?)*
- * Added support for fragments.
+ * Added support for Fragments.
  * Explicitly define Application as parent.
+ * Rondel now works with Dagger 2.4 bindings.
 
 ## 0.2.0 *(26.6.2016)*
  * Added ActivityScope and ServiceScope that are applied to correct super type.

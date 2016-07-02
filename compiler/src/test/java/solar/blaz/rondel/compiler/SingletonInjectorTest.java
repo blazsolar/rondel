@@ -1068,6 +1068,146 @@ public class SingletonInjectorTest {
                 .and()
                 .generatesSources(expectedInjector, expectedComponent);
 
+    }
+
+    @Test
+    public void testInterfaceModule() throws Exception {
+
+        JavaFileObject moduleFile = JavaFileObjects.forSourceString("test.module.AppModule", "package test.module;\n" +
+                "\n" +
+                "import dagger.Module;\n" +
+                "\n" +
+                "@Module\n" +
+                "public interface AppModule {\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject appFile = JavaFileObjects.forSourceString("test.app.App", "package test.app;\n" +
+                "\n" +
+                "@solar.blaz.rondel.App(\n" +
+                "        modules = test.module.AppModule.class\n" +
+                ")\n" +
+                "public class App {\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.app.RondelApp", "package test.app;\n" +
+                "\n" +
+                "import javax.annotation.Generated;\n" +
+                "\n" +
+                "@Generated(\n" +
+                "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n" +
+                "        comments = \"http://blaz.solar/rondel/\"\n" +
+                ")\n" +
+                "public class RondelApp {\n" +
+                "    \n" +
+                "    public static RondelAppComponent inject(App injectie) {\n" +
+                "        RondelAppComponent component = DaggerRondelAppComponent.builder()\n" +
+                "                .build();\n" +
+                "        component.inject(injectie);\n" +
+                "        return component;\n" +
+                "    }\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.app.RondelAppComponent", "package test.app;\n"
+                + "\n"
+                + "import dagger.Component;\n"
+                + "\n"
+                + "import javax.annotation.Generated;\n"
+                + "import javax.inject.Singleton;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
+                + "import test.module.AppModule;\n"
+                + "\n"
+                + "@Generated(\n"
+                + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
+                + "        comments = \"http://blaz.solar/rondel/\"\n"
+                + ")\n"
+                + "@Component(\n"
+                + "        modules = { AppModule.class }\n"
+                + ")\n"
+                + "@Singleton\n"
+                + "public interface RondelAppComponent extends RondelComponent {\n"
+                + "    void inject(App app);\n"
+                + "}");
+
+        assertAbout(javaSources())
+                .that(ImmutableList.of(appFile, moduleFile))
+                .processedWith(new RondelProcessor(), new ComponentProcessor())
+                .compilesWithoutError()
+                .and()
+                .generatesSources(expectedInjector, expectedComponent);
 
     }
+
+    @Test
+    public void testAbstractModule() throws Exception {
+
+        JavaFileObject moduleFile = JavaFileObjects.forSourceString("test.module.AppModule", "package test.module;\n" +
+                "\n" +
+                "import dagger.Module;\n" +
+                "\n" +
+                "@Module\n" +
+                "public abstract class AppModule {\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject appFile = JavaFileObjects.forSourceString("test.app.App", "package test.app;\n" +
+                "\n" +
+                "@solar.blaz.rondel.App(\n" +
+                "        modules = test.module.AppModule.class\n" +
+                ")\n" +
+                "public class App {\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.app.RondelApp", "package test.app;\n" +
+                "\n" +
+                "import javax.annotation.Generated;\n" +
+                "\n" +
+                "@Generated(\n" +
+                "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n" +
+                "        comments = \"http://blaz.solar/rondel/\"\n" +
+                ")\n" +
+                "public class RondelApp {\n" +
+                "    \n" +
+                "    public static RondelAppComponent inject(App injectie) {\n" +
+                "        RondelAppComponent component = DaggerRondelAppComponent.builder()\n" +
+                "                .build();\n" +
+                "        component.inject(injectie);\n" +
+                "        return component;\n" +
+                "    }\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.app.RondelAppComponent", "package test.app;\n"
+                + "\n"
+                + "import dagger.Component;\n"
+                + "\n"
+                + "import javax.annotation.Generated;\n"
+                + "import javax.inject.Singleton;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
+                + "import test.module.AppModule;\n"
+                + "\n"
+                + "@Generated(\n"
+                + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
+                + "        comments = \"http://blaz.solar/rondel/\"\n"
+                + ")\n"
+                + "@Component(\n"
+                + "        modules = { AppModule.class }\n"
+                + ")\n"
+                + "@Singleton\n"
+                + "public interface RondelAppComponent extends RondelComponent {\n"
+                + "    void inject(App app);\n"
+                + "}");
+
+        assertAbout(javaSources())
+                .that(ImmutableList.of(appFile, moduleFile))
+                .processedWith(new RondelProcessor(), new ComponentProcessor())
+                .compilesWithoutError()
+                .and()
+                .generatesSources(expectedInjector, expectedComponent);
+
+    }
+
 }

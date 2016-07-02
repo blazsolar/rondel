@@ -223,6 +223,11 @@ public abstract class AbstractInjectorManager {
         if (moduleElements != null && moduleElements.length > 0) {
             for (TypeElement module : moduleElements) {
 
+                if (isAbstractModule(module)) {
+                    messager.warning(module.getSimpleName() + " is abstract. No instance can be created.");
+                    continue;
+                }
+
                 TypeName moduleName = TypeName.get(module.asType());
                 String moduleNameStringUpper = module.getSimpleName().toString();
                 String moduleNameStringLower = moduleNameStringUpper.substring(0, 1).toLowerCase()
@@ -295,6 +300,12 @@ public abstract class AbstractInjectorManager {
 
         if (moduleElements != null && moduleElements.length > 0) {
             for (TypeElement module : moduleElements) {
+
+                if (isAbstractModule(module)) {
+                    messager.warning(module.getSimpleName() + " is abstract. No instance can be created.");
+                    continue;
+                }
+
                 String moduleMethodName = module.getSimpleName().toString();
                 String moduleMethodNameLower = Character.toLowerCase(moduleMethodName.charAt(0)) + moduleMethodName.substring(1);
 
@@ -311,6 +322,10 @@ public abstract class AbstractInjectorManager {
             }
         }
 
+    }
+
+    private boolean isAbstractModule(TypeElement module) {
+        return module.getKind() == ElementKind.INTERFACE || module.getModifiers().contains(Modifier.ABSTRACT);
     }
 
     /**

@@ -4,3 +4,4 @@ Rondel is Android library that generates [Dagger](http://google.github.io/dagger
 
 ## Limitations
  * Views can not depend on Fragments as parent.
+ * No extra parameters can't be send to modules.
