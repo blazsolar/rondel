@@ -29,6 +29,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="dagger-2.5" level="project" />
     <orderEntry type="library" exported="" name="javax.inject-1" level="project" />
-    <orderEntry type="library" exported="" name="rondel.rondel-0.1.3-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="rondel.rondel-0.2.0-SNAPSHOT" level="project" />
   </component>
 </module>

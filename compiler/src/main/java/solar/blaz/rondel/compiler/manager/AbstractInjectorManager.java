@@ -16,6 +16,10 @@
 
 package solar.blaz.rondel.compiler.manager;
 
+import android.app.Activity;
+import android.app.Application;
+import android.app.Fragment;
+import android.app.Service;
 import android.view.View;
 
 import com.google.auto.common.MoreElements;
@@ -65,10 +69,24 @@ public abstract class AbstractInjectorManager {
     private final Elements elementUtils;
     private final Types typesUtil;
 
+    private final TypeElement appElement;
+    private final TypeElement activityElement;
+    private final TypeElement serviceElement;
+    private final TypeElement fragmentElement;
+    private final TypeElement viewElement;
+    private final TypeElement voidElement;
+
     protected AbstractInjectorManager(Messager messager, Elements elementUtils, Types typesUtil) {
         this.messager = messager;
         this.elementUtils = elementUtils;
         this.typesUtil = typesUtil;
+
+        appElement = elementUtils.getTypeElement(Application.class.getCanonicalName());
+        activityElement = elementUtils.getTypeElement(Activity.class.getCanonicalName());
+        serviceElement = elementUtils.getTypeElement(Service.class.getCanonicalName());
+        fragmentElement = elementUtils.getTypeElement(Fragment.class.getCanonicalName());
+        viewElement = elementUtils.getTypeElement(View.class.getCanonicalName());
+        voidElement = elementUtils.getTypeElement(Void.class.getCanonicalName());
     }
 
     protected TypeElement[] parseViewComponent(ImmutableList<TypeMirror> components) {
@@ -103,26 +121,24 @@ public abstract class AbstractInjectorManager {
 
     protected TypeMirror verifyParent(Element element, TypeMirror componentClass) {
 
-        TypeElement voidElement = elementUtils.getTypeElement(Void.class.getCanonicalName());
+        boolean isView = isView(element.asType());
+        boolean isFragment = isFragment(element.asType());
 
-        TypeElement viewProviderElement = elementUtils.getTypeElement(View.class.getCanonicalName());
-        boolean isView = typesUtil.isSubtype(element.asType(), viewProviderElement.asType());
-
-        if (componentClass == null || typesUtil.isSubtype(componentClass, voidElement.asType())) {
+        if (componentClass == null || isVoid(componentClass)) {
             return null; // no parent
         } else {
 
             // verify that is is provider
             TypeElement componentProviderElement = elementUtils.getTypeElement(ComponentProvider.class.getCanonicalName());
 
-            if (isView) {
+            if (isView || isFragment) {
                 if (typesUtil.isSubtype(componentClass, componentProviderElement.asType())) {
                     return componentClass;
                 } else {
                     messager.error("Parent does not provide component.", element);
                 }
             } else {
-                messager.error("Only View can specify parent.", element);
+                messager.error("Only Views and Fragments can specify parent.", element);
             }
 
         }
@@ -133,9 +149,7 @@ public abstract class AbstractInjectorManager {
 
     protected TypeElement verifyScope(TypeMirror scopeClass) {
 
-        TypeElement voidElement = elementUtils.getTypeElement(Void.class.getCanonicalName());
-
-        if (scopeClass == null || typesUtil.isSubtype(scopeClass, voidElement.asType())) {
+        if (scopeClass == null || isVoid(scopeClass)) {
             return null; // no scope defined
         } else {
 
@@ -346,6 +360,30 @@ public abstract class AbstractInjectorManager {
                 .addMember("value", "\"solar.blaz.rondel.compiler.RondelProcessor\"")
                 .addMember("comments", "\"http://blaz.solar/rondel/\"")
                 .build();
+    }
+
+    protected boolean isApplication(TypeMirror childType) {
+        return typesUtil.isSubtype(childType, appElement.asType());
+    }
+
+    protected boolean isActivity(TypeMirror childType) {
+        return typesUtil.isSubtype(childType, activityElement.asType());
+    }
+
+    protected boolean isService(TypeMirror childType) {
+        return typesUtil.isSubtype(childType, serviceElement.asType());
+    }
+
+    protected boolean isFragment(TypeMirror childType) {
+        return typesUtil.isSubtype(childType, fragmentElement.asType());
+    }
+
+    protected boolean isView(TypeMirror childType) {
+        return typesUtil.isSubtype(childType, viewElement.asType());
+    }
+
+    protected boolean isVoid(TypeMirror childType) {
+        return typesUtil.isSubtype(childType, voidElement.asType());
     }
 
     private static final AnnotationValueVisitor<ImmutableList<TypeMirror>, String> TO_LIST_OF_TYPES =
