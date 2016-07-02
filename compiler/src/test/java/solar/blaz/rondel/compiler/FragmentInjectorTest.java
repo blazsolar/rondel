@@ -3,7 +3,6 @@ package solar.blaz.rondel.compiler;
 import com.google.common.collect.ImmutableList;
 import com.google.testing.compile.JavaFileObjects;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.tools.JavaFileObject;
@@ -352,7 +351,7 @@ public class FragmentInjectorTest {
 
     }
 
-    @Test @Ignore // TODO: 02/07/16 Fix dependency on android.jar
+    @Test
     public void testTestFragmentParent() throws Exception {
 
         JavaFileObject appFile = JavaFileObjects.forSourceString("test.TestApp", "package test;\n"
@@ -440,8 +439,6 @@ public class FragmentInjectorTest {
                 + "\n"
                 + "import javax.annotation.Generated;\n"
                 + "\n"
-                + "import test.ui.RondelTestActivityComponent;\n"
-                + "\n"
                 + "@Generated(\n"
                 + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
                 + "        comments = \"http://blaz.solar/rondel/\"\n"
@@ -452,7 +449,7 @@ public class FragmentInjectorTest {
                 + "    \n"
                 + "    public static RondelTestFragmentComponent inject(TestFragment injectie) {\n"
                 + "        TestParentFragment parent = (TestParentFragment) injectie.getParentFragment();\n"
-                + "        RondelTestActivityComponent baseComponent = (RondelTestActivityComponent) parent.getComponent();\n"
+                + "        RondelTestParentFragmentComponent baseComponent = (RondelTestParentFragmentComponent) parent.getComponent();\n"
                 + "        RondelTestFragmentComponent component = baseComponent.rondelTestFragmentComponentBuilder()\n"
                 + "                .testFragmentModule(getTestFragmentModule(injectie))\n"
                 + "                .build();\n"
