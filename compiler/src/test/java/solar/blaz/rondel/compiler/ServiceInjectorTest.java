@@ -62,13 +62,13 @@ public class ServiceInjectorTest {
                 "\n" +
                 "import android.app.Application;\n" +
                 "import solar.blaz.rondel.App;\n" +
-                "import solar.blaz.rondel.AppComponentProvider;\n" +
+                "import solar.blaz.rondel.ComponentProvider;\n" +
                 "\n" +
                 "@App(\n" +
                 "        components = AppComponent.class,\n" +
                 "        modules = AppModule.class\n" +
                 ")\n" +
-                "public class TestApp extends Application implements AppComponentProvider {\n" +
+                "public class TestApp extends Application implements ComponentProvider {\n" +
                 "    public RondelTestAppComponent getComponent() {\n" +
                 "        return null;\n" +
                 "    }\n" +
@@ -154,7 +154,7 @@ public class ServiceInjectorTest {
                 + "\n"
                 + "import dagger.Subcomponent;\n"
                 + "import javax.annotation.Generated;\n"
-                + "import solar.blaz.rondel.BaseComponent;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
                 + "import solar.blaz.rondel.ServiceScope;\n"
                 + "\n"
                 + "@Generated(\n"
@@ -165,7 +165,7 @@ public class ServiceInjectorTest {
                 + "        modules = { TestModule.class }\n"
                 + ")\n"
                 + "@ServiceScope\n"
-                + "public interface RondelTestServiceComponent extends BaseComponent, TestComponent {\n"
+                + "public interface RondelTestServiceComponent extends RondelComponent, TestComponent {\n"
                 + "    \n"
                 + "    void inject(TestService view);\n"
                 + "\n"

@@ -43,7 +43,7 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import solar.blaz.rondel.ActivityScope;
-import solar.blaz.rondel.BaseComponent;
+import solar.blaz.rondel.RondelComponent;
 import solar.blaz.rondel.FragmentScope;
 import solar.blaz.rondel.Rondel;
 import solar.blaz.rondel.ServiceScope;
@@ -134,7 +134,7 @@ public class ViewInjectorManager extends AbstractInjectorManager {
                 .addAnnotation(getGeneratedAnnotation())
                 .addAnnotation(subcomponentAnnotation.build())
                 .addModifiers(Modifier.PUBLIC)
-                .addSuperinterface(ClassName.get(BaseComponent.class))
+                .addSuperinterface(ClassName.get(RondelComponent.class))
                 .addType(getComponentBuilder(model))
                 .addMethods(getChildMethodBuilders(children))
                 .addMethod(MethodSpec.methodBuilder("inject")

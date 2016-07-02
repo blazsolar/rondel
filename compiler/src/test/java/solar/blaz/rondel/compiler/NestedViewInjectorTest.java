@@ -62,13 +62,13 @@ public class NestedViewInjectorTest {
                 "\n" +
                 "import android.app.Application;\n" +
                 "import solar.blaz.rondel.App;\n" +
-                "import solar.blaz.rondel.AppComponentProvider;\n" +
+                "import solar.blaz.rondel.ComponentProvider;\n" +
                 "\n" +
                 "@App(\n" +
                 "        components = AppComponent.class,\n" +
                 "        modules = AppModule.class\n" +
                 ")\n" +
-                "public class TestApp extends Application implements AppComponentProvider {\n" +
+                "public class TestApp extends Application implements ComponentProvider {\n" +
                 "    public RondelTestAppComponent getComponent() {\n" +
                 "        return null;\n" +
                 "    }\n" +
@@ -95,7 +95,7 @@ public class NestedViewInjectorTest {
         JavaFileObject activityFile = JavaFileObjects.forSourceString("test.ui.TestActivity", "package test.ui;\n" +
                 "\n" +
                 "import android.app.Activity;\n" +
-                "import solar.blaz.rondel.BaseComponent;\n" +
+                "import solar.blaz.rondel.RondelComponent;\n" +
                 "import solar.blaz.rondel.ComponentProvider;\n" +
                 "import solar.blaz.rondel.Rondel;\n" +
                 "\n" +
@@ -106,7 +106,7 @@ public class NestedViewInjectorTest {
                 "public class TestActivity extends Activity implements ComponentProvider {\n" +
                 "\n" +
                 "    @Override\n" +
-                "    public BaseComponent getComponent() {\n" +
+                "    public RondelComponent getComponent() {\n" +
                 "        return null;\n" +
                 "    }\n" +
                 "}");
@@ -135,7 +135,7 @@ public class NestedViewInjectorTest {
                 + "import android.util.AttributeSet;\n"
                 + "import android.widget.LinearLayout;\n"
                 + "\n"
-                + "import solar.blaz.rondel.BaseComponent;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
                 + "import solar.blaz.rondel.ComponentProvider;\n"
                 + "import solar.blaz.rondel.Rondel;\n"
                 + "\n"
@@ -149,7 +149,7 @@ public class NestedViewInjectorTest {
                 + "        super(context, attrs);\n"
                 + "    }\n"
                 + "    \n"
-                + "    @Override public BaseComponent getComponent() {\n"
+                + "    @Override public RondelComponent getComponent() {\n"
                 + "        return null;\n"
                 + "    }\n"
                 + "    \n"
@@ -216,7 +216,7 @@ public class NestedViewInjectorTest {
                 + "\n"
                 + "import dagger.Subcomponent;\n"
                 + "import javax.annotation.Generated;\n"
-                + "import solar.blaz.rondel.BaseComponent;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
                 + "import solar.blaz.rondel.ViewScope;\n"
                 + "\n"
                 + "@Generated(\n"
@@ -225,7 +225,7 @@ public class NestedViewInjectorTest {
                 + ")\n"
                 + "@Subcomponent\n"
                 + "@ViewScope\n"
-                + "public interface RondelTestSubViewComponent extends BaseComponent {\n"
+                + "public interface RondelTestSubViewComponent extends RondelComponent {\n"
                 + "    \n"
                 + "    void inject(TestSubView view);\n"
                 + "    \n"
@@ -274,9 +274,9 @@ public class NestedViewInjectorTest {
         JavaFileObject appFile = JavaFileObjects.forSourceString("test.TestApp", "package test;\n" +
                 "\n" +
                 "import android.app.Application;\n" +
-                "import solar.blaz.rondel.App;\n" +
-                "import solar.blaz.rondel.AppComponentProvider;\n" +
+                "import solar.blaz.rondel.App; \n" +
                 "\n" +
+                "" +
                 "@App(\n" +
                 "        components = AppComponent.class,\n" +
                 "        modules = AppModule.class\n" +
@@ -308,7 +308,7 @@ public class NestedViewInjectorTest {
         JavaFileObject activityFile = JavaFileObjects.forSourceString("test.ui.TestActivity", "package test.ui;\n" +
                 "\n" +
                 "import android.app.Activity;\n" +
-                "import solar.blaz.rondel.BaseComponent;\n" +
+                "import solar.blaz.rondel.RondelComponent;\n" +
                 "import solar.blaz.rondel.ComponentProvider;\n" +
                 "import solar.blaz.rondel.Rondel;\n" +
                 "\n" +
@@ -319,7 +319,7 @@ public class NestedViewInjectorTest {
                 "public class TestActivity extends Activity implements ComponentProvider {\n" +
                 "\n" +
                 "    @Override\n" +
-                "    public BaseComponent getComponent() {\n" +
+                "    public RondelComponent getComponent() {\n" +
                 "        return null;\n" +
                 "    }\n" +
                 "}");

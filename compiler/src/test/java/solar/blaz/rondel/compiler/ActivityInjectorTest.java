@@ -61,13 +61,13 @@ public class ActivityInjectorTest {
         JavaFileObject appFile = JavaFileObjects.forSourceString("test.App", "package test;\n" +
                 "\n" +
                 "import android.app.Application;\n" +
-                "import solar.blaz.rondel.AppComponentProvider;\n" +
+                "import solar.blaz.rondel.ComponentProvider;\n" +
                 "\n" +
                 "@solar.blaz.rondel.App(\n" +
                 "        components = test.AppComponent.class,\n" +
                 "        modules = test.AppModule.class\n" +
                 ")\n" +
-                "public class App extends Application implements AppComponentProvider {\n" +
+                "public class App extends Application implements ComponentProvider {\n" +
                 "    public RondelAppComponent getComponent() {\n" +
                 "        return null;\n" +
                 "    }\n" +
@@ -100,7 +100,7 @@ public class ActivityInjectorTest {
                 + "import dagger.Subcomponent;\n"
                 + "import javax.annotation.Generated;\n"
                 + "import solar.blaz.rondel.ActivityScope;\n"
-                + "import solar.blaz.rondel.BaseComponent;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
                 + "\n"
                 + "@Generated(\n"
                 + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
@@ -110,7 +110,7 @@ public class ActivityInjectorTest {
                 + "        modules = { TestModule.class }\n"
                 + ")\n"
                 + "@ActivityScope\n"
-                + "public interface RondelTestActivityComponent extends BaseComponent {\n"
+                + "public interface RondelTestActivityComponent extends RondelComponent {\n"
                 + "    void inject(TestActivity view);\n"
                 + "    \n"
                 + "    @Subcomponent.Builder\n"
@@ -157,13 +157,13 @@ public class ActivityInjectorTest {
         JavaFileObject appFile = JavaFileObjects.forSourceString("test.App", "package test;\n" +
                 "\n" +
                 "import android.app.Application;\n" +
-                "import solar.blaz.rondel.AppComponentProvider;\n" +
+                "import solar.blaz.rondel.ComponentProvider;\n" +
                 "\n" +
                 "@solar.blaz.rondel.App(\n" +
                 "        components = test.AppComponent.class,\n" +
                 "        modules = test.AppModule.class\n" +
                 ")\n" +
-                "public class App extends Application implements AppComponentProvider {\n" +
+                "public class App extends Application implements ComponentProvider {\n" +
                 "    public RondelAppComponent getComponent() {\n" +
                 "        return null;\n" +
                 "    }\n" +
@@ -219,7 +219,7 @@ public class ActivityInjectorTest {
                 + "import dagger.Subcomponent;\n"
                 + "import javax.annotation.Generated;\n"
                 + "import solar.blaz.rondel.ActivityScope;\n"
-                + "import solar.blaz.rondel.BaseComponent;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
                 + "\n"
                 + "@Generated(\n"
                 + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
@@ -227,7 +227,7 @@ public class ActivityInjectorTest {
                 + ")\n"
                 + "@Subcomponent\n"
                 + "@ActivityScope\n"
-                + "public interface RondelTestActivityComponent extends BaseComponent, TestComponent {\n"
+                + "public interface RondelTestActivityComponent extends RondelComponent, TestComponent {\n"
                 + "    \n"
                 + "    void inject(TestActivity view);\n"
                 + "\n"
@@ -411,21 +411,22 @@ public class ActivityInjectorTest {
                 "    \n" +
                 "}");
 
-        JavaFileObject appFile = JavaFileObjects.forSourceString("test.TestApp", "package test;\n" +
-                "\n" +
-                "import android.app.Application;\n" +
-                "import solar.blaz.rondel.App;\n" +
-                "import solar.blaz.rondel.AppComponentProvider;\n" +
-                "\n" +
-                "@App(\n" +
-                "        components = AppComponent.class,\n" +
-                "        modules = AppModule.class\n" +
-                ")\n" +
-                "public class TestApp extends Application implements AppComponentProvider {\n" +
-                "    public RondelTestAppComponent getComponent() {\n" +
-                "        return null;\n" +
-                "    }\n" +
-                "}");
+        JavaFileObject appFile = JavaFileObjects.forSourceString("test.TestApp", "package test;\n"
+                + "\n"
+                + "import android.app.Application;\n"
+                + "import solar.blaz.rondel.App;\n"
+                + "\n"
+                + "import solar.blaz.rondel.ComponentProvider;\n"
+                + "\n"
+                + "@App(\n"
+                + "        components = AppComponent.class,\n"
+                + "        modules = AppModule.class\n"
+                + ")\n"
+                + "public class TestApp extends Application implements ComponentProvider {\n"
+                + "    public RondelTestAppComponent getComponent() {\n"
+                + "        return null;\n"
+                + "    }\n"
+                + "}");
 
         JavaFileObject activityModuleFile = JavaFileObjects.forSourceString("test.ui.TestModule", "package test.ui;\n" +
                 "\n" +
@@ -502,7 +503,7 @@ public class ActivityInjectorTest {
                 + "import dagger.Subcomponent;\n"
                 + "import javax.annotation.Generated;\n"
                 + "import solar.blaz.rondel.ActivityScope;\n"
-                + "import solar.blaz.rondel.BaseComponent;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
                 + "\n"
                 + "@Generated(\n"
                 + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
@@ -512,7 +513,7 @@ public class ActivityInjectorTest {
                 + "        modules = { TestModule.class }\n"
                 + ")\n"
                 + "@ActivityScope\n"
-                + "public interface RondelTestActivityComponent extends BaseComponent, TestComponent {\n"
+                + "public interface RondelTestActivityComponent extends RondelComponent, TestComponent {\n"
                 + "    \n"
                 + "    void inject(TestActivity view);\n"
                 + "\n"
@@ -558,13 +559,13 @@ public class ActivityInjectorTest {
                 "\n" +
                 "import android.app.Application;\n" +
                 "import solar.blaz.rondel.App;\n" +
-                "import solar.blaz.rondel.AppComponentProvider;\n" +
+                "import solar.blaz.rondel.ComponentProvider;\n" +
                 "\n" +
                 "@App(\n" +
                 "        components = AppComponent.class,\n" +
                 "        modules = AppModule.class\n" +
                 ")\n" +
-                "public class TestApp extends Application implements AppComponentProvider {\n" +
+                "public class TestApp extends Application implements ComponentProvider {\n" +
                 "    public RondelTestAppComponent getComponent() {\n" +
                 "        return null;\n" +
                 "    }\n" +
@@ -647,7 +648,7 @@ public class ActivityInjectorTest {
                 + "import dagger.Subcomponent;\n"
                 + "import javax.annotation.Generated;\n"
                 + "import solar.blaz.rondel.ActivityScope;\n"
-                + "import solar.blaz.rondel.BaseComponent;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
                 + "\n"
                 + "@Generated(\n"
                 + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
@@ -657,7 +658,7 @@ public class ActivityInjectorTest {
                 + "        modules = { TestModule.class }\n"
                 + ")\n"
                 + "@ActivityScope\n"
-                + "public interface RondelTestActivityComponent extends BaseComponent, TestComponent {\n"
+                + "public interface RondelTestActivityComponent extends RondelComponent, TestComponent {\n"
                 + "    \n"
                 + "    void inject(TestActivity view);\n"
                 + "    \n"
@@ -706,9 +707,9 @@ public class ActivityInjectorTest {
         JavaFileObject appFile = JavaFileObjects.forSourceString("test.TestApp", "package test;\n" +
                 "\n" +
                 "import android.app.Application;\n" +
-                "import solar.blaz.rondel.App;\n" +
-                "import solar.blaz.rondel.AppComponentProvider;\n" +
+                "import solar.blaz.rondel.App; \n" +
                 "\n" +
+                "" +
                 "@App(\n" +
                 "        components = AppComponent.class,\n" +
                 "        modules = AppModule.class\n" +
@@ -779,12 +780,12 @@ public class ActivityInjectorTest {
                 "\n" +
                 "import android.app.Application;\n" +
                 "import solar.blaz.rondel.App;\n" +
-                "import solar.blaz.rondel.AppComponentProvider;\n" +
+                "import solar.blaz.rondel.ComponentProvider;\n" +
                 "\n" +
                 "@App(\n" +
                 "        modules = AppModule.class\n" +
                 ")\n" +
-                "public class TestApp extends Application implements AppComponentProvider {\n" +
+                "public class TestApp extends Application implements ComponentProvider {\n" +
                 "    public RondelTestAppComponent getComponent() {\n" +
                 "        return null;\n" +
                 "    }\n" +
@@ -868,7 +869,7 @@ public class ActivityInjectorTest {
                 + "import dagger.Subcomponent;\n"
                 + "import javax.annotation.Generated;\n"
                 + "import solar.blaz.rondel.ActivityScope;\n"
-                + "import solar.blaz.rondel.BaseComponent;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
                 + "import test.ui.component.TestComponent;\n"
                 + "import test.ui.module.TestModule;\n"
                 + "\n"
@@ -880,7 +881,7 @@ public class ActivityInjectorTest {
                 + "        modules = { TestModule.class }\n"
                 + ")\n"
                 + "@ActivityScope\n"
-                + "public interface RondelTestActivityComponent extends BaseComponent, TestComponent {\n"
+                + "public interface RondelTestActivityComponent extends RondelComponent, TestComponent {\n"
                 + "    \n"
                 + "    void inject(TestActivity view);\n"
                 + "\n"
@@ -930,13 +931,13 @@ public class ActivityInjectorTest {
                 "\n" +
                 "import android.app.Application;\n" +
                 "import solar.blaz.rondel.App;\n" +
-                "import solar.blaz.rondel.AppComponentProvider;\n" +
+                "import solar.blaz.rondel.ComponentProvider;\n" +
                 "\n" +
                 "@App(\n" +
                 "        components = AppComponent.class,\n" +
                 "        modules = AppModule.class\n" +
                 ")\n" +
-                "public class TestApp extends Application implements AppComponentProvider {\n" +
+                "public class TestApp extends Application implements ComponentProvider {\n" +
                 "    public RondelTestAppComponent getComponent() {\n" +
                 "        return null;\n" +
                 "    }\n" +
@@ -1040,7 +1041,7 @@ public class ActivityInjectorTest {
                 + "import dagger.Subcomponent;\n"
                 + "import javax.annotation.Generated;\n"
                 + "import solar.blaz.rondel.ActivityScope;\n"
-                + "import solar.blaz.rondel.BaseComponent;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
                 + "\n"
                 + "@Generated(\n"
                 + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
@@ -1050,7 +1051,7 @@ public class ActivityInjectorTest {
                 + "        modules = { TestModule.class, TestModule2.class }\n"
                 + ")\n"
                 + "@ActivityScope\n"
-                + "public interface RondelTestActivityComponent extends BaseComponent, TestComponent {\n"
+                + "public interface RondelTestActivityComponent extends RondelComponent, TestComponent {\n"
                 + "    \n"
                 + "    void inject(TestActivity view);\n"
                 + "\n"
@@ -1102,13 +1103,13 @@ public class ActivityInjectorTest {
                 "\n" +
                 "import android.app.Application;\n" +
                 "import solar.blaz.rondel.App;\n" +
-                "import solar.blaz.rondel.AppComponentProvider;\n" +
+                "import solar.blaz.rondel.ComponentProvider;\n" +
                 "\n" +
                 "@App(\n" +
                 "        components = AppComponent.class,\n" +
                 "        modules = AppModule.class\n" +
                 ")\n" +
-                "public class TestApp extends Application implements AppComponentProvider {\n" +
+                "public class TestApp extends Application implements ComponentProvider {\n" +
                 "    public RondelTestAppComponent getComponent() {\n" +
                 "        return null;\n" +
                 "    }\n" +
@@ -1216,7 +1217,7 @@ public class ActivityInjectorTest {
                 + "import dagger.Subcomponent;\n"
                 + "import javax.annotation.Generated;\n"
                 + "import solar.blaz.rondel.ActivityScope;\n"
-                + "import solar.blaz.rondel.BaseComponent;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
                 + "\n"
                 + "@Generated(\n"
                 + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
@@ -1226,7 +1227,7 @@ public class ActivityInjectorTest {
                 + "        modules = { TestModule.class, TestModule2.class }\n"
                 + ")\n"
                 + "@ActivityScope\n"
-                + "public interface RondelTestActivityComponent extends BaseComponent, TestComponent {\n"
+                + "public interface RondelTestActivityComponent extends RondelComponent, TestComponent {\n"
                 + "    \n"
                 + "    void inject(TestActivity view);\n"
                 + "\n"
@@ -1288,13 +1289,13 @@ public class ActivityInjectorTest {
                 "\n" +
                 "import android.app.Application;\n" +
                 "import solar.blaz.rondel.App;\n" +
-                "import solar.blaz.rondel.AppComponentProvider;\n" +
+                "import solar.blaz.rondel.ComponentProvider;\n" +
                 "\n" +
                 "@App(\n" +
                 "        components = AppComponent.class,\n" +
                 "        modules = AppModule.class\n" +
                 ")\n" +
-                "public class TestApp extends Application implements AppComponentProvider {\n" +
+                "public class TestApp extends Application implements ComponentProvider {\n" +
                 "    public RondelTestAppComponent getComponent() {\n" +
                 "        return null;\n" +
                 "    }\n" +
@@ -1376,7 +1377,7 @@ public class ActivityInjectorTest {
                 + "\n"
                 + "import dagger.Subcomponent;\n"
                 + "import javax.annotation.Generated;\n"
-                + "import solar.blaz.rondel.BaseComponent;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
                 + "import test.CustomScope;\n"
                 + "\n"
                 + "@Generated(\n"
@@ -1387,7 +1388,7 @@ public class ActivityInjectorTest {
                 + "        modules = { TestModule.class }\n"
                 + ")\n"
                 + "@CustomScope\n"
-                + "public interface RondelTestActivityComponent extends BaseComponent, TestComponent {\n"
+                + "public interface RondelTestActivityComponent extends RondelComponent, TestComponent {\n"
                 + "    \n"
                 + "    void inject(TestActivity view);\n"
                 + "\n"
@@ -1442,9 +1443,9 @@ public class ActivityInjectorTest {
         JavaFileObject appFile = JavaFileObjects.forSourceString("test.TestApp", "package test;\n" +
                 "\n" +
                 "import android.app.Application;\n" +
-                "import solar.blaz.rondel.App;\n" +
-                "import solar.blaz.rondel.AppComponentProvider;\n" +
+                "import solar.blaz.rondel.App; \n" +
                 "\n" +
+                "" +
                 "@App(\n" +
                 "        components = AppComponent.class,\n" +
                 "        modules = AppModule.class\n" +

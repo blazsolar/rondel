@@ -44,7 +44,7 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import solar.blaz.rondel.App;
-import solar.blaz.rondel.BaseAppComponent;
+import solar.blaz.rondel.RondelComponent;
 import solar.blaz.rondel.compiler.Constants;
 import solar.blaz.rondel.compiler.model.ComponentModel;
 import solar.blaz.rondel.compiler.model.InjectorModel;
@@ -175,7 +175,7 @@ public class SingletonInjectorManager extends AbstractInjectorManager {
                 .addAnnotation(componentAnnotation.build())
                 .addAnnotation(ClassName.get("javax.inject", "Singleton"))
                 .addModifiers(Modifier.PUBLIC)
-                .addSuperinterface(BaseAppComponent.class);
+                .addSuperinterface(RondelComponent.class);
 
         if (model.components != null && model.components.length > 0) {
             for (TypeElement component : model.components) {

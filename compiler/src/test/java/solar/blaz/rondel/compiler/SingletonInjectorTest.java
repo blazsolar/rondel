@@ -118,7 +118,7 @@ public class SingletonInjectorTest {
                 + "\n"
                 + "import javax.annotation.Generated;\n"
                 + "import javax.inject.Singleton;\n"
-                + "import solar.blaz.rondel.BaseAppComponent;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
                 + "\n"
                 + "@Generated(\n"
                 + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
@@ -128,7 +128,7 @@ public class SingletonInjectorTest {
                 + "        modules = { AppModule.class }\n"
                 + ")\n"
                 + "@Singleton\n"
-                + "public interface RondelAppComponent extends BaseAppComponent {\n"
+                + "public interface RondelAppComponent extends RondelComponent {\n"
                 + "    void inject(App app);\n"
                 + "}");
 
@@ -220,7 +220,7 @@ public class SingletonInjectorTest {
                 + "\n"
                 + "import javax.annotation.Generated;\n"
                 + "import javax.inject.Singleton;\n"
-                + "import solar.blaz.rondel.BaseAppComponent;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
                 + "\n"
                 + "@Generated(\n"
                 + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
@@ -228,7 +228,7 @@ public class SingletonInjectorTest {
                 + ")\n"
                 + "@Component\n"
                 + "@Singleton\n"
-                + "public interface RondelAppComponent extends BaseAppComponent, AppComponent {\n"
+                + "public interface RondelAppComponent extends RondelComponent, AppComponent {\n"
                 + "    void inject(App app);\n"
                 + "}");
 
@@ -345,7 +345,7 @@ public class SingletonInjectorTest {
                 + "\n"
                 + "import javax.annotation.Generated;\n"
                 + "import javax.inject.Singleton;\n"
-                + "import solar.blaz.rondel.BaseAppComponent;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
                 + "\n"
                 + "@Generated(\n"
                 + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
@@ -355,7 +355,7 @@ public class SingletonInjectorTest {
                 + "        modules = { AppModule.class }\n"
                 + ")\n"
                 + "@Singleton\n"
-                + "public interface RondelAppComponent extends BaseAppComponent, AppComponent {\n"
+                + "public interface RondelAppComponent extends RondelComponent, AppComponent {\n"
                 + "    void inject(App app);\n"
                 + "}");
 
@@ -442,7 +442,7 @@ public class SingletonInjectorTest {
                 + "\n"
                 + "import javax.annotation.Generated;\n"
                 + "import javax.inject.Singleton;\n"
-                + "import solar.blaz.rondel.BaseAppComponent;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
                 + "\n"
                 + "@Generated(\n"
                 + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
@@ -452,7 +452,7 @@ public class SingletonInjectorTest {
                 + "        modules = { TestAppModule.class }\n"
                 + ")\n"
                 + "@Singleton\n"
-                + "public interface RondelTestAppComponent extends BaseAppComponent, TestAppComponent {\n"
+                + "public interface RondelTestAppComponent extends RondelComponent, TestAppComponent {\n"
                 + "    void inject(TestApp app);\n"
                 + "}");
 
@@ -535,7 +535,7 @@ public class SingletonInjectorTest {
                 + "import dagger.Component;\n"
                 + "import javax.annotation.Generated;\n"
                 + "import javax.inject.Singleton;\n"
-                + "import solar.blaz.rondel.BaseAppComponent;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
                 + "\n"
                 + "@Generated(\n"
                 + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
@@ -545,7 +545,7 @@ public class SingletonInjectorTest {
                 + "        modules = { TestAppModule.class }\n"
                 + ")\n"
                 + "@Singleton\n"
-                + "public interface RondelTestAppComponent extends BaseAppComponent, TestAppComponent {\n"
+                + "public interface RondelTestAppComponent extends RondelComponent, TestAppComponent {\n"
                 + "    void inject(TestApp app);\n"
                 + "}");
 
@@ -675,7 +675,7 @@ public class SingletonInjectorTest {
                 + "\n"
                 + "import javax.annotation.Generated;\n"
                 + "import javax.inject.Singleton;\n"
-                + "import solar.blaz.rondel.BaseAppComponent;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
                 + "\n"
                 + "@Generated(\n"
                 + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
@@ -685,7 +685,7 @@ public class SingletonInjectorTest {
                 + "        modules = { TestAppModule.class }\n"
                 + ")\n"
                 + "@Singleton\n"
-                + "public interface RondelTestAppComponent extends BaseAppComponent, TestAppComponent {\n"
+                + "public interface RondelTestAppComponent extends RondelComponent, TestAppComponent {\n"
                 + "    void inject(TestApp app);\n"
                 + "}");
 
@@ -848,7 +848,7 @@ public class SingletonInjectorTest {
                 + "\n"
                 + "import javax.annotation.Generated;\n"
                 + "import javax.inject.Singleton;\n"
-                + "import solar.blaz.rondel.BaseAppComponent;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
                 + "\n"
                 + "@Generated(\n"
                 + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
@@ -858,7 +858,7 @@ public class SingletonInjectorTest {
                 + "        modules = { TestAppModule.class, TestAppModule2.class }\n"
                 + ")\n"
                 + "@Singleton\n"
-                + "public interface RondelTestAppComponent extends BaseAppComponent, TestAppComponent {\n"
+                + "public interface RondelTestAppComponent extends RondelComponent, TestAppComponent {\n"
                 + "    void inject(TestApp app);\n"
                 + "}");
 
@@ -948,7 +948,7 @@ public class SingletonInjectorTest {
                 + "\n"
                 + "import javax.annotation.Generated;\n"
                 + "import javax.inject.Singleton;\n"
-                + "import solar.blaz.rondel.BaseAppComponent;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
                 + "\n"
                 + "@Generated(\n"
                 + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
@@ -958,7 +958,7 @@ public class SingletonInjectorTest {
                 + "        modules = { Test1AppModule.class }\n"
                 + ")\n"
                 + "@Singleton\n"
-                + "public interface RondelTest3AppComponent extends BaseAppComponent, Test2AppComponent {\n"
+                + "public interface RondelTest3AppComponent extends RondelComponent, Test2AppComponent {\n"
                 + "    void inject(Test3App app);\n"
                 + "}");
 
@@ -1045,9 +1045,9 @@ public class SingletonInjectorTest {
                 + "\n"
                 + "import javax.annotation.Generated;\n"
                 + "import javax.inject.Singleton;\n"
-                + "import solar.blaz.rondel.BaseAppComponent;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
                 + "import test.component.AppComponent;\n"
-                + "import test.module.AppModule\n"
+                + "import test.module.AppModule;\n"
                 + "\n"
                 + "@Generated(\n"
                 + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
@@ -1057,7 +1057,7 @@ public class SingletonInjectorTest {
                 + "        modules = { AppModule.class }\n"
                 + ")\n"
                 + "@Singleton\n"
-                + "public interface RondelAppComponent extends BaseAppComponent, AppComponent {\n"
+                + "public interface RondelAppComponent extends RondelComponent, AppComponent {\n"
                 + "    void inject(App app);\n"
                 + "}");
 

@@ -17,5 +17,5 @@
 package solar.blaz.rondel;
 
 public interface ComponentProvider {
-    BaseComponent getComponent();
+    RondelComponent getComponent();
 }
