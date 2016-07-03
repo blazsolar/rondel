@@ -44,16 +44,12 @@
     <orderEntry type="library" scope="TEST" name="Gradle: junit:junit:4.12" level="project" />
     <orderEntry type="library" name="Gradle: com.google.dagger:dagger-producers:2.5" level="project" />
     <orderEntry type="library" name="Gradle: com.google.dagger:dagger-compiler:2.5" level="project" />
-    <orderEntry type="module-library">
-      <library name="Gradle: android">
-        <CLASSES>
-          <root url="jar://$USER_HOME$/Library/Android/sdk/platforms/android-24/android.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
+    <orderEntry type="library" name="Gradle: com.google.auto:auto-common:0.6" level="project" />
+    <orderEntry type="library" name="Gradle: com.squareup:javapoet:1.7.0" level="project" />
+    <orderEntry type="library" name="Gradle: javax.inject:javax.inject:1" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.guava:guava:19.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.dagger:dagger:2.5" level="project" />
+    <orderEntry type="module-library" scope="TEST">
       <library name="Gradle: android-support-v4">
         <CLASSES>
           <root url="jar://$USER_HOME$/Library/Android/sdk/extras/android/support/v4/android-support-v4.jar!/" />
@@ -62,10 +58,14 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="Gradle: com.google.auto:auto-common:0.6" level="project" />
-    <orderEntry type="library" name="Gradle: com.squareup:javapoet:1.7.0" level="project" />
-    <orderEntry type="library" name="Gradle: javax.inject:javax.inject:1" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.guava:guava:19.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.dagger:dagger:2.5" level="project" />
+    <orderEntry type="module-library" scope="TEST">
+      <library name="Gradle: android">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/Library/Android/sdk/platforms/android-24/android.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

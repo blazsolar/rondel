@@ -1,0 +1,64 @@
+
+def isReleaseBuild() {
+    return version.contains("SNAPSHOT") == false
+}
+
+def mavenRepoUrl
+if (isReleaseBuild()) {
+    println 'RELEASE BUILD'
+    mavenRepoUrl = "s3://kamino-maven.s3.eu-central-1.amazonaws.com/lib-release"
+} else {
+    println 'DEBUG BUILD'
+    mavenRepoUrl = "s3://kamino-maven.s3.eu-central-1.amazonaws.com/lib-snapshot"
+}
+
+publishing {
+    repositories {
+        maven {
+            url mavenRepoUrl
+            credentials(AwsCredentials) {
+                accessKey kaminoMavenAccessKey
+                secretKey kaminoMavenSecretKey
+            }
+        }
+    }
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+        bintray(MavenPublication) {
+            from components.java
+            groupId LIBRARY_GROUP
+            artifactId project.name
+            version LIBRARY_VERSION
+        }
+    }
+}
+
+bintray {
+    user = bintrayUser
+    key = bintrayKey
+    pkg {
+        repo = 'maven'
+        name = project.name
+        licenses = ['Apache-2.0']
+        desc = 'Rondel is an annotation processor that makes use of Dagger easier on Android.'
+        websiteUrl = 'http://blaz.solar/rondel'
+        issueTrackerUrl = 'https://github.com/blazsolar/rondel/issues'
+        vcsUrl = 'https://github.com/blazsolar/rondel.git'
+
+        githubRepo = 'blazsolar/rondel'
+        githubReleaseNotesFile = 'CHANGELOG.md'
+
+        version {
+            name = LIBRARY_VERSION
+            released  = new Date()
+
+            mavenCentralSync {
+                user = sonatypeUsername
+                password = sonatypePassword
+            }
+        }
+    }
+    publications = ['bintray']
+}
