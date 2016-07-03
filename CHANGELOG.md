@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.3.0 *(?)*
+## 0.3.0 *(3.6.2106)*
  * Added support for Fragments.
  * Explicitly define Application as parent.
  * Rondel now works with Dagger 2.4 bindings.

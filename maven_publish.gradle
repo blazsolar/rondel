@@ -1,8 +1,3 @@
-
-def isReleaseBuild() {
-    return version.contains("SNAPSHOT") == false
-}
-
 /*
  *    Copyright 2016 Blaž Šolar
  *
@@ -18,6 +13,11 @@ def isReleaseBuild() {
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+
+def isReleaseBuild() {
+    return version.contains("SNAPSHOT") == false
+}
 
 def mavenRepoUrl
 if (isReleaseBuild()) {
