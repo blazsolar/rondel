@@ -2,11 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/api/rondel.iml" filepath="$PROJECT_DIR$/api/rondel.iml" />
-      <module fileurl="file://$PROJECT_DIR$/compiler/rondel-compiler.iml" filepath="$PROJECT_DIR$/compiler/rondel-compiler.iml" />
-      <module fileurl="file://$PROJECT_DIR$/rondel-project.iml" filepath="$PROJECT_DIR$/rondel-project.iml" />
-      <module fileurl="file://$PROJECT_DIR$/test/rondel-test.iml" filepath="$PROJECT_DIR$/test/rondel-test.iml" />
-      <module fileurl="file://$PROJECT_DIR$/testCompiler/rondel-test-compiler.iml" filepath="$PROJECT_DIR$/testCompiler/rondel-test-compiler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/api/rondel.iml" filepath="$PROJECT_DIR$/.idea/modules/api/rondel.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/compiler/rondel-compiler.iml" filepath="$PROJECT_DIR$/.idea/modules/compiler/rondel-compiler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rondel-project.iml" filepath="$PROJECT_DIR$/.idea/modules/rondel-project.iml" />
     </modules>
   </component>
 </project>

@@ -14,11 +14,16 @@
  *    limitations under the License.
  */
 
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id 'com.jfrog.bintray' version '1.7'
+}
+
 group LIBRARY_GROUP
 version LIBRARY_VERSION
 
-apply plugin: 'java'
-apply plugin: 'maven-publish'
+apply from: "../maven_publish.gradle"
 
 sourceCompatibility = 1.6
 
@@ -28,30 +33,4 @@ repositories {
 
 dependencies {
     compile 'com.google.dagger:dagger:2.5'
-}
-
-def mavenRepoUrl
-if (isReleaseBuild()) {
-    println 'RELEASE BUILD'
-    mavenRepoUrl = "s3://kamino-maven.s3.eu-central-1.amazonaws.com/lib-release"
-} else {
-    println 'DEBUG BUILD'
-    mavenRepoUrl = "s3://kamino-maven.s3.eu-central-1.amazonaws.com/lib-snapshot"
-}
-
-publishing {
-    repositories {
-        maven {
-            url mavenRepoUrl
-            credentials(AwsCredentials) {
-                accessKey kaminoMavenAccessKey
-                secretKey kaminoMavenSecretKey
-            }
-        }
-    }
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
 }

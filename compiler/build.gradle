@@ -14,47 +14,36 @@
  *    limitations under the License.
  */
 
-buildscript {
-    repositories {
-        maven { url "https://plugins.gradle.org/m2/" }
-        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-    }
-    dependencies {
-        classpath "net.ltgt.gradle:gradle-apt-plugin:0.5"
-        classpath 'org.junit:junit-gradle:5.0.0-SNAPSHOT'
-    }
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id 'jacoco'
+    id 'net.ltgt.apt' version '0.6'
+    id 'com.jfrog.bintray' version '1.7'
 }
 
 group LIBRARY_GROUP
 version LIBRARY_VERSION
 
-apply plugin: 'java'
-apply plugin: 'maven-publish'
-apply plugin: "jacoco"
-apply plugin: 'idea'
-apply plugin: "net.ltgt.apt"
+apply from: "../maven_publish.gradle"
 
 sourceCompatibility = 1.8
 
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+def sdkDir = properties.getProperty('sdk.dir')
+
 repositories {
     mavenCentral()
-    maven {
-        url "s3://kamino-maven/lib-release"
-        credentials(AwsCredentials) {
-            accessKey kaminoMavenAccessKey
-            secretKey kaminoMavenSecretKey
-        }
-    }
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 }
 
 dependencies {
+
     compile project(':rondel')
     compile 'com.google.dagger:dagger:2.5'
     compile 'com.squareup:javapoet:1.7.0'
     compile 'com.google.guava:guava:19.0'
     compile 'com.google.auto:auto-common:0.6'
-    compile 'com.google.android:android:4.1.1.4'
 
     apt 'com.google.dagger:dagger-compiler:2.5'
 
@@ -63,6 +52,8 @@ dependencies {
     testCompile 'com.google.testing.compile:compile-testing:0.9'
     testCompile files(org.gradle.internal.jvm.Jvm.current().getToolsJar())
     testCompile 'com.google.dagger:dagger-compiler:2.5'
+    testCompile files("${sdkDir}/extras/android/support/v4/android-support-v4.jar")
+    testCompile files("${sdkDir}/platforms/android-24/android.jar")
 
 }
 
@@ -90,32 +81,5 @@ test {
                 '**.*_Provide*Factory*',
                 '**.*Factory*'
         ]
-    }
-}
-
-def mavenRepoUrl
-if (isReleaseBuild()) {
-    println 'RELEASE BUILD'
-    mavenRepoUrl = "s3://kamino-maven.s3.eu-central-1.amazonaws.com/lib-release"
-} else {
-    println 'DEBUG BUILD'
-    mavenRepoUrl = "s3://kamino-maven.s3.eu-central-1.amazonaws.com/lib-snapshot"
-}
-
-
-publishing {
-    repositories {
-        maven {
-            url mavenRepoUrl
-            credentials(AwsCredentials) {
-                accessKey kaminoMavenAccessKey
-                secretKey kaminoMavenSecretKey
-            }
-        }
-    }
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
     }
 }

@@ -16,12 +16,6 @@
 
 package solar.blaz.rondel.compiler.manager;
 
-import android.app.Activity;
-import android.app.Application;
-import android.app.Service;
-import android.view.View;
-import android.view.ViewParent;
-
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -47,8 +41,9 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import solar.blaz.rondel.ActivityScope;
-import solar.blaz.rondel.BaseComponent;
+import solar.blaz.rondel.FragmentScope;
 import solar.blaz.rondel.Rondel;
+import solar.blaz.rondel.RondelComponent;
 import solar.blaz.rondel.ServiceScope;
 import solar.blaz.rondel.ViewScope;
 import solar.blaz.rondel.compiler.Constants;
@@ -65,13 +60,7 @@ public class ViewInjectorManager extends AbstractInjectorManager {
 
     private final Filer filer;
     private final Elements elementsUtil;
-    private final Types typesUtil;
     private final Messager messager;
-
-    private final TypeElement appElement;
-    private final TypeElement activityElement;
-    private final TypeElement serviceElement;
-    private final TypeElement viewElement;
 
     @Inject
     protected ViewInjectorManager(Messager messager, Elements elementUtils, Filer filer, Elements elementsUtil, Types typesUtil) {
@@ -79,18 +68,12 @@ public class ViewInjectorManager extends AbstractInjectorManager {
         this.messager = messager;
         this.filer = filer;
         this.elementsUtil = elementsUtil;
-        this.typesUtil = typesUtil;
-
-        appElement = elementsUtil.getTypeElement(Application.class.getCanonicalName());
-        activityElement = elementsUtil.getTypeElement(Activity.class.getCanonicalName());
-        serviceElement = elementsUtil.getTypeElement(Service.class.getCanonicalName());
-        viewElement = elementsUtil.getTypeElement(View.class.getCanonicalName());
-
     }
 
     public ComponentModel parse(Element element) {
 
         if (!isValidType(element)) {
+            messager.error("Element type not supported.", element);
             return null;
         }
 
@@ -148,7 +131,7 @@ public class ViewInjectorManager extends AbstractInjectorManager {
                 .addAnnotation(getGeneratedAnnotation())
                 .addAnnotation(subcomponentAnnotation.build())
                 .addModifiers(Modifier.PUBLIC)
-                .addSuperinterface(ClassName.get(BaseComponent.class))
+                .addSuperinterface(ClassName.get(RondelComponent.class))
                 .addType(getComponentBuilder(model))
                 .addMethods(getChildMethodBuilders(children))
                 .addMethod(MethodSpec.methodBuilder("inject")
@@ -161,12 +144,15 @@ public class ViewInjectorManager extends AbstractInjectorManager {
             TypeMirror elementType = model.element.asType();
             boolean isActivity = isActivity(elementType);
             boolean isService = isService(elementType);
+            boolean isFragment = isFragment(elementType);
             boolean isView = isView(elementType);
 
             if (isActivity) {
                 builder.addAnnotation(ActivityScope.class);
             } else if (isService) {
                 builder.addAnnotation(ServiceScope.class);
+            } else if (isFragment) {
+                builder.addAnnotation(FragmentScope.class);
             } else if (isView) {
                 builder.addAnnotation(ViewScope.class);
             } else {
@@ -250,70 +236,53 @@ public class ViewInjectorManager extends AbstractInjectorManager {
 
         boolean isActivity = isActivity(model.superType);
         boolean isService = isService(model.superType);
+        boolean isFragment = isFragment(model.superType);
         boolean isView = isView(model.superType);
 
         ClassName parentClass = (ClassName) ClassName.get(parent.element.asType());
         ClassName parentComponentClass = ClassName.get(parent.packageName, parent.name);
 
         CodeBlock injectLogic;
+        StringBuilder formatBuilder = new StringBuilder();
+        List<Object> formatParams = new ArrayList<>();
 
         if (isActivity || isService) {
 
-            injector.addField(parentComponentClass, "component", Modifier.PRIVATE, Modifier.STATIC);
-
-            injector.addMethod(MethodSpec.methodBuilder("getComponent")
-                    .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
-                    .returns(parentComponentClass)
-                    .addParameter(parentClass, "app")
-                    .addCode(CodeBlock.builder()
-                            .add("if (component != null) {")
-                            .add("return component;")
-                            .add("} else {")
-                            .add("return ($T) app.getComponent();", parentComponentClass)
-                            .add("}")
-                            .build())
-                    .build());
-
-            injector.addMethod(MethodSpec.methodBuilder("setComponent")
-                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .addParameter(parentComponentClass, "component")
-                    .addCode("$L.component = component;", model.name)
-                    .build());
-
-            List<Object> formatParams = new ArrayList<>();
             formatParams.add(parentClass);
             formatParams.add(parentClass);
-            formatParams.add(component);
-            formatParams.add(builderMethodName);
 
-            StringBuilder formatBuilder = new StringBuilder("$T app = ($T) injectie.getApplicationContext();\n" +
-                    "$T component = getComponent(app).$L()\n");
+            formatBuilder.append("$T parent = ($T) injectie.getApplicationContext();\n");
 
-            formatBuilder.append(formatBuilderModule(model.modules, formatParams));
+        } else if (isFragment) {
 
-            formatBuilder.append("        .build();\n" +
-                    "component.inject(injectie);\n" +
-                    "return component;");
+            formatParams.add(parentClass);
+            formatParams.add(parentClass);
 
-            injectLogic = CodeBlock.builder()
-                    .add(formatBuilder.toString(), formatParams.toArray())
-                    .build();
+            boolean isParentApp = isApplication(parent.element.asType());
+            boolean isParentActivity = isActivity(parent.element.asType());
+            boolean isParentFragment = isFragment(parent.element.asType());
+
+            if (isParentApp) {
+                formatBuilder.append("$T parent = ($T) injectie.getActivity().getApplicationContext();\n");
+            } else if (isParentActivity) {
+                formatBuilder.append("$T parent = ($T) injectie.getActivity();\n");
+            } else if (isParentFragment) {
+                formatBuilder.append("$T parent = ($T) injectie.getParentFragment();\n");
+            } else {
+                messager.error("Unknown parent type", model.element);
+                return;
+            }
 
         } else if (isView) {
 
-            List<Object> formatParams = new ArrayList<>();
             formatParams.add(parentClass);
             formatParams.add(parentClass);
-            formatParams.add(parentComponentClass);
-            formatParams.add(parentComponentClass);
-            formatParams.add(component);
-            formatParams.add(builderMethodName);
 
             boolean isParentApp = isApplication(parent.element.asType());
             boolean isParentActivity = isActivity(parent.element.asType());
             boolean isParentView = isView(parent.element.asType());
 
-            StringBuilder formatBuilder = new StringBuilder();
+            formatBuilder = new StringBuilder();
             if (isParentApp) {
                 formatBuilder.append("$T parent = ($T) injectie.getContext().getApplicationContext();\n");
             } else if (isParentActivity) {
@@ -322,7 +291,7 @@ public class ViewInjectorManager extends AbstractInjectorManager {
                 formatBuilder.append("$T parent = ($T) getParent(injectie.getParent());\n");
                 injector.addMethod(MethodSpec.methodBuilder("getParent")
                         .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
-                        .addParameter(ViewParent.class, "view")
+                        .addParameter(ClassName.get("android.view", "ViewParent"), "view")
                         .returns(parentClass)
                         .addCode(CodeBlock.of("if (view instanceof $T) {\n"
                                 + "    return ($T) view;\n"
@@ -336,62 +305,45 @@ public class ViewInjectorManager extends AbstractInjectorManager {
                                 + "}\n", parentClass, parentClass))
                         .build());
             } else {
-                messager.error("Unknown parent type");
+                messager.error("Unknown parent type", model.element);
+                return;
             }
-
-            formatBuilder.append("$T baseComponent = ($T) parent.getComponent();\n" +
-                    "$T component = baseComponent.$L()\n");
-
-            formatBuilder.append(formatBuilderModule(model.modules, formatParams));
-
-            formatBuilder.append("        .build();\n" +
-                    "component.inject(injectie);\n" +
-                    "return component;");
-
-            injectLogic = CodeBlock.builder()
-                    .add(formatBuilder.toString(), formatParams.toArray())
-                    .build();
 
         } else {
             messager.error("Injected view not valid type.", model.element);
-            injectLogic = null;
+            return;
         }
 
-        if (injectLogic != null) {
-            injector.addMethod(MethodSpec.methodBuilder("inject")
-                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .returns(component)
-                    .addParameter(TypeName.get(model.view), "injectie")
-                    .addCode(injectLogic)
-                    .build());
-        }
+        formatParams.add(parentComponentClass);
+        formatParams.add(parentComponentClass);
+        formatParams.add(component);
+        formatParams.add(builderMethodName);
+
+        formatBuilder.append("$T baseComponent = ($T) parent.getComponent();\n" +
+                "$T component = baseComponent.$L()\n");
+
+        formatBuilder.append(formatBuilderModule(model.modules, formatParams));
+
+        formatBuilder.append("        .build();\n" +
+                "component.inject(injectie);\n" +
+                "return component;");
+
+        injectLogic = CodeBlock.builder()
+                .add(formatBuilder.toString(), formatParams.toArray())
+                .build();
+
+        injector.addMethod(MethodSpec.methodBuilder("inject")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(component)
+                .addParameter(TypeName.get(model.view), "injectie")
+                .addCode(injectLogic)
+                .build());
 
     }
 
     private boolean isValidType(Element element) {
-
-        TypeElement activityElement = elementsUtil.getTypeElement(Activity.class.getCanonicalName());
-        TypeElement serviceElement = elementsUtil.getTypeElement(Service.class.getCanonicalName());
-        TypeElement viewElement = elementsUtil.getTypeElement(View.class.getCanonicalName());
-        return typesUtil.isSubtype(element.asType(), activityElement.asType()) ||
-                typesUtil.isSubtype(element.asType(), serviceElement.asType()) ||
-                typesUtil.isSubtype(element.asType(), viewElement.asType());
-
+        TypeMirror typeMirror = element.asType();
+        return isActivity(typeMirror) || isService(typeMirror) || isFragment(typeMirror) || isView(typeMirror);
     }
 
-    private boolean isApplication(TypeMirror childType) {
-        return typesUtil.isSubtype(childType, appElement.asType());
-    }
-
-    private boolean isActivity(TypeMirror childType) {
-        return typesUtil.isSubtype(childType, activityElement.asType());
-    }
-
-    private boolean isService(TypeMirror childType) {
-        return typesUtil.isSubtype(childType, serviceElement.asType());
-    }
-
-    private boolean isView(TypeMirror childType) {
-        return typesUtil.isSubtype(childType, viewElement.asType());
-    }
 }

@@ -16,6 +16,6 @@
 
 package solar.blaz.rondel;
 
-public interface BaseAppComponent {
+public interface RondelComponent {
 
 }

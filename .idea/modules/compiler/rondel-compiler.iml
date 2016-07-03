@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id=":rondel-compiler" external.linked.project.path="$MODULE_DIR$/../../../compiler" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="solar.blaz" external.system.module.version="0.3.0-SNAPSHOT" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
+    <output url="file://$MODULE_DIR$/../../../compiler/build/classes/main" />
+    <output-test url="file://$MODULE_DIR$/../../../compiler/build/classes/test" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../../compiler">
+      <sourceFolder url="file://$MODULE_DIR$/../../../compiler/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../compiler/src/test/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../compiler/src/main/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../compiler/src/test/resources" type="java-test-resource" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../compiler/.gradle" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../compiler/build/classes" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../compiler/build/dependency-cache" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../compiler/build/jacoco" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../compiler/build/libs" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../compiler/build/publications" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../compiler/build/reports" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../compiler/build/resources" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../compiler/build/test-results" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../compiler/build/tmp" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../compiler/build/generated/source/apt/main">
+      <sourceFolder url="file://$MODULE_DIR$/../../../compiler/build/generated/source/apt/main" isTestSource="false" generated="true" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../compiler/build/generated/source/apt/test">
+      <sourceFolder url="file://$MODULE_DIR$/../../../compiler/build/generated/source/apt/test" isTestSource="true" generated="true" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="rondel" />
+    <orderEntry type="module-library" scope="TEST">
+      <library name="Gradle: tools">
+        <CLASSES>
+          <root url="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_73.jdk/Contents/Home/lib/tools.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" scope="TEST" name="Gradle: org.hamcrest:hamcrest-core:1.3" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: com.google.testing.compile:compile-testing:0.9" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: com.google.truth:truth:0.28" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: junit:junit:4.12" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.dagger:dagger-producers:2.5" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.dagger:dagger-compiler:2.5" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.auto:auto-common:0.6" level="project" />
+    <orderEntry type="library" name="Gradle: com.squareup:javapoet:1.7.0" level="project" />
+    <orderEntry type="library" name="Gradle: javax.inject:javax.inject:1" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.guava:guava:19.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.dagger:dagger:2.5" level="project" />
+    <orderEntry type="module-library" scope="TEST">
+      <library name="Gradle: android-support-v4">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/Library/Android/sdk/extras/android/support/v4/android-support-v4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="TEST">
+      <library name="Gradle: android">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/Library/Android/sdk/platforms/android-24/android.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+  </component>
+</module>

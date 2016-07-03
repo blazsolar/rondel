@@ -16,6 +16,11 @@
 
 package solar.blaz.rondel;
 
-public interface BaseComponent {
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
+import javax.inject.Scope;
+
+@Scope @Retention(RetentionPolicy.RUNTIME)
+public @interface FragmentScope {
 }
