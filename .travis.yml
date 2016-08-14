@@ -1,4 +1,7 @@
-language: java
+language: android
 jdk:
   - oraclejdk8
+android:
+  - android-24
+  - extra-android-support
   
