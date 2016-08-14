@@ -21,4 +21,3 @@ findProject(':compiler')?.name = 'rondel-compiler'
 findProject(':api')?.name = 'rondel'
 //findProject(':test')?.name = 'rondel-test'
 //findProject(':testCompiler')?.name = 'rondel-test-compiler'
-
