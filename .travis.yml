@@ -1,7 +1,11 @@
 language: android
+android:
+  components:
+    - android-24
+    - extra-android-support
+  licenses:
+    - 'android-sdk-preview-license-52d11cd2'
+    - 'android-sdk-license-.+'
+    - 'google-gdk-license-.+'
 jdk:
   - oraclejdk8
-android:
-  - android-24
-  - extra-android-support
-  
