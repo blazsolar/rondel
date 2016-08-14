@@ -33,8 +33,8 @@ publishing {
         maven {
             url mavenRepoUrl
             credentials(AwsCredentials) {
-                accessKey kaminoMavenAccessKey
-                secretKey kaminoMavenSecretKey
+                accessKey hasProperty('kaminoMavenAccessKey') ? kaminoMavenAccessKey : ''
+                secretKey hasProperty('kaminoMavenSecretKey') ? kaminoMavenSecretKey : ''
             }
         }
     }
@@ -52,8 +52,8 @@ publishing {
 }
 
 bintray {
-    user = bintrayUser
-    key = bintrayKey
+    user = hasProperty('bintrayUser') ? bintrayUser : ''
+    key = hasProperty('bintrayKey') ? bintrayKey : ''
     pkg {
         repo = 'maven'
         name = project.name
@@ -71,8 +71,8 @@ bintray {
             released  = new Date()
 
             mavenCentralSync {
-                user = sonatypeUsername
-                password = sonatypePassword
+                user = hasProperty('sonatypeUsername') ? sonatypeUsername : ''
+                password = hasProperty('sonatypePassword') ? sonatypePassword : ''
             }
         }
     }
