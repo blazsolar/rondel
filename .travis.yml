@@ -9,4 +9,6 @@ android:
     - 'google-gdk-license-.+'
 jdk:
   - oraclejdk8
+before_install:
+  - echo "sdk.dir=usr/local/android-sdk" >> local.properties
 script: ./gradlew check
