@@ -12,5 +12,5 @@ jdk:
 before_install:
   - echo "sdk.dir=/usr/local/android-sdk" >> local.properties
   - cat local.properties
-  - ls /usr/local/android-sdk/platforms/android-24/
+  - ls /usr/local/android-sdk/
 script: ./gradlew check
