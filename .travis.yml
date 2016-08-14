@@ -1,6 +1,7 @@
 language: android
 android:
   components:
+    - tools
     - android-24
     - extra-android-support
   licenses:
