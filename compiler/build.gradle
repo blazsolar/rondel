@@ -20,6 +20,7 @@ plugins {
     id 'jacoco'
     id 'net.ltgt.apt' version '0.6'
     id 'com.jfrog.bintray' version '1.7'
+    id 'com.github.kt3k.coveralls' version '2.6.3'
 }
 
 group LIBRARY_GROUP
