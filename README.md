@@ -1,6 +1,6 @@
 # Rondel
 
-[![Build Status](https://travis-ci.com/blazsolar/rondel.svg?token=gjxgmGPqnpccSN7MZGPp&branch=master)](https://travis-ci.com/blazsolar/rondel)
+[![Build Status](https://travis-ci.org/blazsolar/rondel.svg?branch=master)](https://travis-ci.org/blazsolar/rondel)
 [![Coverage Status](https://coveralls.io/repos/github/blazsolar/rondel/badge.svg)](https://coveralls.io/github/blazsolar/rondel)
 
 Rondel is an annotation processor that makes use of [Dagger](http://google.github.io/dagger/) easier on Android.
