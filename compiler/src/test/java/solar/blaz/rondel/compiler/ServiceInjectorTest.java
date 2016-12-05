@@ -122,7 +122,7 @@ public class ServiceInjectorTest {
                 + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
                 + "        comments = \"http://blaz.solar/rondel/\"\n"
                 + ")\n"
-                + "class RondelTestService {\n"
+                + "public class RondelTestService {\n"
                 + "    \n"
                 + "    private static TestModule testModule;\n"
                 + "\n"

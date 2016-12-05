@@ -216,7 +216,8 @@ public class ViewInjectorManager extends AbstractInjectorManager {
     private void writeInjector(InjectorModel model, ComponentModel parent) throws IOException {
 
         TypeSpec.Builder injector = TypeSpec.classBuilder(model.name)
-                .addAnnotation(getGeneratedAnnotation());
+                .addAnnotation(getGeneratedAnnotation())
+                .addModifiers(Modifier.PUBLIC);
 
         addInjectMethods(model, parent, injector);
         addTestSpecs(model.modules, injector, model.view);

@@ -186,7 +186,7 @@ public class NestedViewInjectorTest {
                 + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
                 + "        comments = \"http://blaz.solar/rondel/\"\n"
                 + ")\n"
-                + "class RondelTestSubView {\n"
+                + "public class RondelTestSubView {\n"
                 + "    \n"
                 + "    private static TestView getParent(ViewParent view) {\n"
                 + "        if (view instanceof TestView) {\n"
