@@ -16,6 +16,8 @@
 
 package solar.blaz.rondel.compiler.model;
 
+import com.squareup.javapoet.ClassName;
+
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
@@ -29,9 +31,9 @@ public class ComponentModel {
     public String packageName;
     public TypeMirror view;
     public TypeElement[] modules;
-    public TypeElement[] components;
+    public ClassName[] components;
     public Element element;
-    public TypeMirror parent;
+    public TypeMirror[] parents;
     public TypeElement scope;
 
     public InjectorModel injector;

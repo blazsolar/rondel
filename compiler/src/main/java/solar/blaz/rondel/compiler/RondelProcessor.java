@@ -21,7 +21,9 @@ import com.google.common.collect.LinkedListMultimap;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -31,6 +33,7 @@ import javax.inject.Inject;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 
 import solar.blaz.rondel.App;
@@ -50,7 +53,8 @@ public class RondelProcessor extends AbstractProcessor {
     @Inject Messager messager;
     @Inject Types typesUtil;
 
-    private LinkedListMultimap<ComponentModel, ComponentModel> components = LinkedListMultimap.create();
+    private LinkedListMultimap<ComponentModel, ComponentModel> children = LinkedListMultimap.create();
+    private LinkedListMultimap<ComponentModel, ComponentModel> parents = LinkedListMultimap.create();
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -67,7 +71,7 @@ public class RondelProcessor extends AbstractProcessor {
 
         ComponentModel parsedComponent = singletonInjectorManager.parse(env);
         if (parsedComponent != null) {
-            components.put(null, parsedComponent);
+            children.put(null, parsedComponent);
         }
 
         if (singletonInjectorManager.hasComponent()) {
@@ -78,34 +82,48 @@ public class RondelProcessor extends AbstractProcessor {
 
             Set<? extends Element> elements = env.getElementsAnnotatedWith(Rondel.class);
 
-            for (Element element : elements) {
+            Map<TypeMirror, ComponentModel> elementToModel = new HashMap<>();
+            elementToModel.put(appComponent.element.asType(), appComponent);
 
+
+            for (Element element : elements) {
                 ComponentModel componentModel = viewInjectorManager.parse(element);
                 if (componentModel != null) {
                     componentModels.add(componentModel);
+                    elementToModel.put(componentModel.element.asType(), componentModel);
                 }
-
             }
 
+
             for (ComponentModel componentModel : componentModels) {
-                if (componentModel.parent == null || typesUtil.isSubtype(componentModel.parent, appComponent.element.asType())) {
-                    components.put(appComponent, componentModel);
+                if (componentModel.parents == null || componentModel.parents.length == 0) {
+                    children.put(appComponent, componentModel);
+                    parents.put(componentModel, appComponent);
                 } else {
-                    for (ComponentModel parent : componentModels) {
-                        if (typesUtil.isSubtype(componentModel.parent, parent.element.asType())) {
-                            components.put(parent, componentModel);
+                    for (TypeMirror parent : componentModel.parents) {
+                        parents.put(componentModel, elementToModel.get(parent));
+                        if (typesUtil.isSubtype(parent, appComponent.element.asType())) {
+                            children.put(appComponent, componentModel);
+                        } else {
+                            for (ComponentModel child : componentModels) {
+                                if (typesUtil.isSubtype(parent, child.element.asType())) {
+                                    children.put(elementToModel.get(parent), componentModel);
+                                    break;
+                                }
+                            }
                         }
                     }
                 }
             }
 
             try {
-
-                List<ComponentModel> children = generateFiles(appComponent);
-                singletonInjectorManager.write(children);
-
+                singletonInjectorManager.write(children.get(appComponent));
+                for (ComponentModel item : componentModels) {
+                    List<ComponentModel> parent = this.parents.get(item);
+                    viewInjectorManager.write(item, parent, children.get(item));
+                }
             } catch (IOException e) {
-                messager.warning("Failed to write files.");
+                messager.warning("Failed to write files: " + e.getMessage());
             }
 
         }
@@ -121,20 +139,6 @@ public class RondelProcessor extends AbstractProcessor {
     @Override
     public Set<String> getSupportedAnnotationTypes() {
         return ImmutableSet.of(Rondel.class.getName(), App.class.getName());
-    }
-
-    private List<ComponentModel> generateFiles(ComponentModel parent) throws IOException {
-
-        List<ComponentModel> children = components.get(parent);
-        if (children != null && children.size() > 0) {
-            for (ComponentModel child : children) {
-                List<ComponentModel> nestedChildren = generateFiles(child);
-                viewInjectorManager.write(child, parent, nestedChildren);
-            }
-        }
-
-        return children;
-
     }
 
 }

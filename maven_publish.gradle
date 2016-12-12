@@ -42,39 +42,39 @@ publishing {
         mavenJava(MavenPublication) {
             from components.java
         }
-        bintray(MavenPublication) {
-            from components.java
-            groupId LIBRARY_GROUP
-            artifactId project.name
-            version LIBRARY_VERSION
-        }
+//        bintray(MavenPublication) {
+//            from components.java
+//            groupId LIBRARY_GROUP
+//            artifactId project.name
+//            version LIBRARY_VERSION
+//        }
     }
 }
 
-bintray {
-    user = hasProperty('bintrayUser') ? bintrayUser : ''
-    key = hasProperty('bintrayKey') ? bintrayKey : ''
-    pkg {
-        repo = 'maven'
-        name = project.name
-        licenses = ['Apache-2.0']
-        desc = 'Rondel is an annotation processor that makes use of Dagger easier on Android.'
-        websiteUrl = 'http://blaz.solar/rondel'
-        issueTrackerUrl = 'https://github.com/blazsolar/rondel/issues'
-        vcsUrl = 'https://github.com/blazsolar/rondel.git'
-
-        githubRepo = 'blazsolar/rondel'
-        githubReleaseNotesFile = 'CHANGELOG.md'
-
-        version {
-            name = LIBRARY_VERSION
-            released  = new Date()
-
-            mavenCentralSync {
-                user = hasProperty('sonatypeUsername') ? sonatypeUsername : ''
-                password = hasProperty('sonatypePassword') ? sonatypePassword : ''
-            }
-        }
-    }
-    publications = ['bintray']
-}
+//bintray {
+//    user = hasProperty('bintrayUser') ? bintrayUser : ''
+//    key = hasProperty('bintrayKey') ? bintrayKey : ''
+//    pkg {
+//        repo = 'maven'
+//        name = project.name
+//        licenses = ['Apache-2.0']
+//        desc = 'Rondel is an annotation processor that makes use of Dagger easier on Android.'
+//        websiteUrl = 'http://blaz.solar/rondel'
+//        issueTrackerUrl = 'https://github.com/blazsolar/rondel/issues'
+//        vcsUrl = 'https://github.com/blazsolar/rondel.git'
+//
+//        githubRepo = 'blazsolar/rondel'
+//        githubReleaseNotesFile = 'CHANGELOG.md'
+//
+//        version {
+//            name = LIBRARY_VERSION
+//            released  = new Date()
+//
+//            mavenCentralSync {
+//                user = hasProperty('sonatypeUsername') ? sonatypeUsername : ''
+//                password = hasProperty('sonatypePassword') ? sonatypePassword : ''
+//            }
+//        }
+//    }
+//    publications = ['bintray']
+//}

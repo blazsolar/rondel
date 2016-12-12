@@ -142,7 +142,7 @@ public class NestedViewInjectorTest {
                 + "@Rondel(\n"
                 + "        components = TestViewComponent.class,\n"
                 + "        modules = TestViewModule.class,\n"
-                + "        parent = test.ui.TestActivity.class\n"
+                + "        parents = test.ui.TestActivity.class\n"
                 + ")\n"
                 + "public class TestView extends LinearLayout implements ComponentProvider {\n"
                 + "    public TestView(Context context, AttributeSet attrs) {\n"
@@ -155,6 +155,18 @@ public class NestedViewInjectorTest {
                 + "    \n"
                 + "}");
 
+        JavaFileObject scopeFile = JavaFileObjects.forSourceString("test.CustomScope", "package test;\n"
+                + "\n"
+                + "import java.lang.annotation.Retention;\n"
+                + "import java.lang.annotation.RetentionPolicy;\n"
+                + "\n"
+                + "import javax.inject.Scope;\n"
+                + "\n"
+                + "@Scope @Retention(RetentionPolicy.RUNTIME)\n"
+                + "public @interface CustomScope {\n"
+                + "}\n");
+
+
         JavaFileObject subViewFile = JavaFileObjects.forSourceString("test.ui.view.sub.TestSubView", "package test.ui.view.sub;\n" +
                 "\n" +
                 "" +
@@ -165,7 +177,8 @@ public class NestedViewInjectorTest {
                 "import test.ui.view.TestView;\n" +
                 "\n" +
                 "@Rondel(\n" +
-                "        parent = test.ui.view.TestView.class\n" +
+                "        parents = test.ui.view.TestView.class,\n" +
+                "        scope = test.CustomScope.class\n" +
                 ")\n" +
                 "public class TestSubView extends View {\n" +
                 "    public TestSubView(Context context, AttributeSet attrs) {\n" +
@@ -176,9 +189,7 @@ public class NestedViewInjectorTest {
         JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.ui.view.sub.RondelTestSubView", "package test.ui.view.sub;\n"
                 + "\n"
                 + "import android.view.ViewParent;\n"
-                + "\n"
                 + "import javax.annotation.Generated;\n"
-                + "\n"
                 + "import test.ui.view.RondelTestViewComponent;\n"
                 + "import test.ui.view.TestView;\n"
                 + "\n"
@@ -187,6 +198,14 @@ public class NestedViewInjectorTest {
                 + "        comments = \"http://blaz.solar/rondel/\"\n"
                 + ")\n"
                 + "public class RondelTestSubView {\n"
+                + "\n"
+                + "    public static RondelTestSubViewComponent inject(TestSubView injectie) {\n"
+                + "        return inject(getComponent(injectie), injectie);\n"
+                + "    }\n"
+                + "\n"
+                + "    private static RondelTestViewComponent getComponent(TestSubView injectie) {\n"
+                + "        return (RondelTestViewComponent) getParent(injectie.getParent()).getComponent();\n"
+                + "    }\n"
                 + "    \n"
                 + "    private static TestView getParent(ViewParent view) {\n"
                 + "        if (view instanceof TestView) {\n"
@@ -201,9 +220,7 @@ public class NestedViewInjectorTest {
                 + "        }\n"
                 + "    }\n"
                 + "    \n"
-                + "    public static RondelTestSubViewComponent inject(TestSubView injectie) {\n"
-                + "        TestView parent = (TestView) getParent(injectie.getParent());\n"
-                + "        RondelTestViewComponent baseComponent = (RondelTestViewComponent) parent.getComponent();\n"
+                + "    public static RondelTestSubViewComponent inject(RondelTestViewComponent baseComponent, TestSubView injectie) {\n"
                 + "        RondelTestSubViewComponent component = baseComponent.rondelTestSubViewComponentBuilder()\n"
                 + "                .build();\n"
                 + "        component.inject(injectie);\n"
@@ -217,14 +234,14 @@ public class NestedViewInjectorTest {
                 + "import dagger.Subcomponent;\n"
                 + "import javax.annotation.Generated;\n"
                 + "import solar.blaz.rondel.RondelComponent;\n"
-                + "import solar.blaz.rondel.ViewScope;\n"
+                + "import test.CustomScope;\n"
                 + "\n"
                 + "@Generated(\n"
                 + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
                 + "        comments = \"http://blaz.solar/rondel/\"\n"
                 + ")\n"
                 + "@Subcomponent\n"
-                + "@ViewScope\n"
+                + "@CustomScope\n"
                 + "public interface RondelTestSubViewComponent extends RondelComponent {\n"
                 + "    \n"
                 + "    void inject(TestSubView view);\n"
@@ -238,13 +255,295 @@ public class NestedViewInjectorTest {
 
         assertAbout(javaSources())
                 .that(ImmutableList.of(appFile, moduleFile, componentFile, activityFile, activityModuleFile,
-                        activityComponentFile, viewModuleFile, viewComponentFile, viewFile, subViewFile))
+                        activityComponentFile, viewModuleFile, viewComponentFile, viewFile, subViewFile, scopeFile))
                 .processedWith(new RondelProcessor(), new ComponentProcessor())
                 .compilesWithoutError()
                 .and()
                 .generatesSources(expectedInjector, expectedComponent);
 
     }
+
+
+    @Test
+    public void multipleParentsSameType() throws Exception {
+
+        JavaFileObject moduleFile = JavaFileObjects.forSourceString("test.AppModule", "package test;\n" +
+                "\n" +
+                "import dagger.Module;\n" +
+                "\n" +
+                "@Module\n" +
+                "public class AppModule {\n" +
+                "    \n" +
+                "    public AppModule(TestApp app) {\n" +
+                "        \n" +
+                "    }\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject componentFile = JavaFileObjects.forSourceString("test.AppComponent", "package test;\n" +
+                "\n" +
+                "import dagger.Component;\n" +
+                "\n" +
+                "@Component\n" +
+                "public interface AppComponent {\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject appFile = JavaFileObjects.forSourceString("test.TestApp", "package test;\n" +
+                "\n" +
+                "import android.app.Application;\n" +
+                "import solar.blaz.rondel.App;\n" +
+                "import solar.blaz.rondel.ComponentProvider;\n" +
+                "\n" +
+                "@App(\n" +
+                "        components = AppComponent.class,\n" +
+                "        modules = AppModule.class\n" +
+                ")\n" +
+                "public class TestApp extends Application implements ComponentProvider {\n" +
+                "    public RondelTestAppComponent getComponent() {\n" +
+                "        return null;\n" +
+                "    }\n" +
+                "}");
+
+        JavaFileObject secondActivityFile = JavaFileObjects.forSourceString("test.ui.SecondTestActivity", "package test.ui;\n" +
+                "\n" +
+                "import android.app.Activity;\n" +
+                "import solar.blaz.rondel.RondelComponent;\n" +
+                "import solar.blaz.rondel.ComponentProvider;\n" +
+                "import solar.blaz.rondel.Rondel;\n" +
+                "\n" +
+                "@Rondel\n" +
+                "public class SecondTestActivity extends Activity implements ComponentProvider {\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public RondelComponent getComponent() {\n" +
+                "        return null;\n" +
+                "    }\n" +
+                "}");
+
+
+        JavaFileObject activityModuleFile = JavaFileObjects.forSourceString("test.ui.TestModule", "package test.ui;\n" +
+                "\n" +
+                "import dagger.Module;\n" +
+                "\n" +
+                "@Module\n" +
+                "public class TestModule {\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject activityComponentFile = JavaFileObjects.forSourceString("test.ui.TestComponent", "package test.ui;\n" +
+                "\n" +
+                "import dagger.Component;\n" +
+                "\n" +
+                "@Component\n" +
+                "public interface TestComponent {\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject activityFile = JavaFileObjects.forSourceString("test.ui.TestActivity", "package test.ui;\n" +
+                "\n" +
+                "import android.app.Activity;\n" +
+                "import solar.blaz.rondel.RondelComponent;\n" +
+                "import solar.blaz.rondel.ComponentProvider;\n" +
+                "import solar.blaz.rondel.Rondel;\n" +
+                "\n" +
+                "@Rondel(\n" +
+                "        components = TestComponent.class,\n" +
+                "        modules = TestModule.class\n" +
+                ")\n" +
+                "public class TestActivity extends Activity implements ComponentProvider {\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public RondelComponent getComponent() {\n" +
+                "        return null;\n" +
+                "    }\n" +
+                "}");
+
+        JavaFileObject viewModuleFile = JavaFileObjects.forSourceString("test.ui.view.TestViewModule", "package test.ui.view;\n" +
+                "\n" +
+                "import dagger.Module;\n" +
+                "\n" +
+                "@Module\n" +
+                "public class TestViewModule {\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject viewComponentFile = JavaFileObjects.forSourceString("test.ui.view.TestViewComponent", "package test.ui.view;\n" +
+                "\n" +
+                "import dagger.Component;\n" +
+                "\n" +
+                "@Component\n" +
+                "public interface TestViewComponent {\n" +
+                "    \n" +
+                "}");
+
+        JavaFileObject viewFile = JavaFileObjects.forSourceString("test.ui.view.TestView", "package test.ui.view;\n"
+                + "\n"
+                + "import android.content.Context;\n"
+                + "import android.util.AttributeSet;\n"
+                + "import android.widget.LinearLayout;\n"
+                + "\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
+                + "import solar.blaz.rondel.ComponentProvider;\n"
+                + "import solar.blaz.rondel.Rondel;\n"
+                + "\n"
+                + "@Rondel(\n"
+                + "        components = TestViewComponent.class,\n"
+                + "        modules = TestViewModule.class,\n"
+                + "        parents = test.ui.TestActivity.class\n"
+                + ")\n"
+                + "public class TestView extends LinearLayout implements ComponentProvider {\n"
+                + "    public TestView(Context context, AttributeSet attrs) {\n"
+                + "        super(context, attrs);\n"
+                + "    }\n"
+                + "    \n"
+                + "    @Override public RondelComponent getComponent() {\n"
+                + "        return null;\n"
+                + "    }\n"
+                + "    \n"
+                + "}");
+
+        JavaFileObject scopeFile = JavaFileObjects.forSourceString("test.CustomScope", "package test;\n"
+                + "\n"
+                + "import java.lang.annotation.Retention;\n"
+                + "import java.lang.annotation.RetentionPolicy;\n"
+                + "\n"
+                + "import javax.inject.Scope;\n"
+                + "\n"
+                + "@Scope @Retention(RetentionPolicy.RUNTIME)\n"
+                + "public @interface CustomScope {\n"
+                + "}\n");
+
+        JavaFileObject subViewFile = JavaFileObjects.forSourceString("test.ui.view.sub.TestSubView", "package test.ui.view.sub;\n"
+                + "\n"
+                + "import android.content.Context;\n"
+                + "import android.util.AttributeSet;\n"
+                + "import android.view.View;\n"
+                + "import solar.blaz.rondel.Rondel;\n"
+                + "import test.ui.view.TestView;\n"
+                + "\n"
+                + "@Rondel(\n"
+                + "        scope = test.CustomScope.class,\n"
+                + "        parents = {\n"
+                + "                test.ui.TestActivity.class,\n"
+                + "                test.ui.SecondTestActivity.class\n"
+                + "        }\n"
+                + ")\n"
+                + "public class TestSubView extends View {\n"
+                + "    public TestSubView(Context context, AttributeSet attrs) {\n"
+                + "        super(context, attrs);\n"
+                + "    }\n"
+                + "}");
+
+        JavaFileObject expectedInjector = JavaFileObjects.forSourceString("test.ui.view.sub.RondelTestSubView", "package test.ui.view.sub;\n"
+                + "\n"
+                + "import javax.annotation.Generated;\n"
+                + "import solar.blaz.rondel.ComponentProvider;\n"
+                + "\n"
+                + "@Generated(\n"
+                + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
+                + "        comments = \"http://blaz.solar/rondel/\"\n"
+                + ")\n"
+                + "public class RondelTestSubView {\n"
+                + "    \n"
+                + "    public static RondelTestSubViewComponent inject(TestSubView injectie) {\n"
+                + "        ComponentProvider parent = (ComponentProvider) injectie.getContext();\n"
+                + "        RondelTestSubViewComponentParent baseComponent = (RondelTestSubViewComponentParent) parent.getComponent();\n"
+                + "        RondelTestSubViewComponent component = baseComponent.rondelTestSubViewComponentBuilder()\n"
+                + "                .build();\n"
+                + "        component.inject(injectie);\n"
+                + "        return component;\n"
+                + "    }\n"
+                + "    \n"
+                + "}");
+
+        JavaFileObject expectedComponent = JavaFileObjects.forSourceString("test.ui.view.sub.RondelSubTestViewComponent", "package test.ui.view.sub;\n"
+                + "\n"
+                + "import dagger.Subcomponent;\n"
+                + "import javax.annotation.Generated;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
+                + "import test.CustomScope;\n"
+                + "\n"
+                + "@Generated(\n"
+                + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
+                + "        comments = \"http://blaz.solar/rondel/\"\n"
+                + ")\n"
+                + "@Subcomponent\n"
+                + "@CustomScope\n"
+                + "public interface RondelTestSubViewComponent extends RondelComponent {\n"
+                + "    \n"
+                + "    void inject(TestSubView view);\n"
+                + "    \n"
+                + "    @Subcomponent.Builder\n"
+                + "    interface Builder {\n"
+                + "        RondelTestSubViewComponent build();\n"
+                + "    }\n"
+                + "    \n"
+                + "}");
+
+        JavaFileObject expectedParentComponent = JavaFileObjects.forSourceString("test.ui.view.sub.RondelTestSubViewComponentParent", "package test.ui.view.sub;\n"
+                + "\n"
+                + "import javax.annotation.Generated;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
+                + "\n"
+                + "@Generated(\n"
+                + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
+                + "        comments = \"http://blaz.solar/rondel/\"\n"
+                + ")\n"
+                + "public interface RondelTestSubViewComponentParent extends RondelComponent {\n"
+                + "    \n"
+                + "    RondelTestSubViewComponent.Builder rondelTestSubViewComponentBuilder();\n"
+                + "    \n"
+                + "}");
+
+        JavaFileObject expectedActivityComponent = JavaFileObjects.forSourceString("test.ui.RondelTestActivityComponent", "package test.ui;\n"
+                + "\n"
+                + "import dagger.Subcomponent;\n"
+                + "import javax.annotation.Generated;\n"
+                + "import solar.blaz.rondel.ActivityScope;\n"
+                + "import solar.blaz.rondel.RondelComponent;\n"
+                + "import test.ui.view.RondelTestViewComponent;\n"
+                + "import test.ui.view.sub.RondelTestSubViewComponent;\n"
+                + "import test.ui.view.sub.RondelTestSubViewComponentParent;\n"
+                + "\n"
+                + "@Generated(\n"
+                + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
+                + "        comments = \"http://blaz.solar/rondel/\"\n"
+                + ")\n"
+                + "@Subcomponent(\n"
+                + "        modules = { TestModule.class }\n"
+                + ")\n"
+                + "@ActivityScope\n"
+                + "public interface RondelTestActivityComponent extends RondelComponent, TestComponent, RondelTestSubViewComponentParent {\n"
+                + "\n"
+                + "    RondelTestViewComponent.Builder rondelTestViewComponentBuilder();\n"
+                + "\n"
+                + "    RondelTestSubViewComponent.Builder rondelTestSubViewComponentBuilder();\n"
+                + "\n"
+                + "    void inject(TestActivity view);\n"
+                + "    \n"
+                + "    @Subcomponent.Builder\n"
+                + "    interface Builder {\n"
+                + "        Builder testModule(TestModule module);\n"
+                + "        \n"
+                + "        RondelTestActivityComponent build();\n"
+                + "    }\n"
+                + "    \n"
+                + "}");
+
+
+        assertAbout(javaSources())
+                .that(ImmutableList.of(appFile, moduleFile, componentFile, activityFile, activityModuleFile,
+                        activityComponentFile, viewModuleFile, viewComponentFile, viewFile, subViewFile, scopeFile,
+                        secondActivityFile))
+                .processedWith(new RondelProcessor(), new ComponentProcessor())
+                .compilesWithoutError()
+                .and()
+                .generatesSources(expectedInjector, expectedComponent, expectedParentComponent,
+                        expectedActivityComponent);
+
+    }
+
 
     @Test
     public void testParentNotProvider() throws Exception {
@@ -353,7 +652,7 @@ public class NestedViewInjectorTest {
                 + "@Rondel(\n"
                 + "        components = TestViewComponent.class,\n"
                 + "        modules = TestViewModule.class,\n"
-                + "        parent = test.ui.TestActivity.class\n"
+                + "        parents = test.ui.TestActivity.class\n"
                 + ")\n"
                 + "public class TestView extends LinearLayout {\n"
                 + "    public TestView(Context context, AttributeSet attrs) {\n"
@@ -372,7 +671,7 @@ public class NestedViewInjectorTest {
                 "import test.ui.view.TestView;\n" +
                 "\n" +
                 "@Rondel(\n" +
-                "        parent = test.ui.view.TestView.class\n" +
+                "        parents = test.ui.view.TestView.class\n" +
                 ")\n" +
                 "public class TestSubView extends View {\n" +
                 "    public TestSubView(Context context, AttributeSet attrs) {\n" +

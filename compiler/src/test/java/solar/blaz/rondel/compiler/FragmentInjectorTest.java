@@ -206,15 +206,15 @@ public class FragmentInjectorTest {
         JavaFileObject fragmentFile = JavaFileObjects.forSourceString("test.ui.fragment.TestFragment", "package test.ui.fragment;\n"
                 + "\n"
                 + "import android.app.Fragment;\n"
-                + "import android.content.Context;\n"
-                + "import android.util.AttributeSet;\n"
-                + "import android.view.View;\n"
+                + "\n"
+                + "\n"
+                + "\n"
                 + "import solar.blaz.rondel.Rondel;\n"
                 + "\n"
                 + "@Rondel(\n"
                 + "        components = TestFragmentComponent.class,\n"
                 + "        modules = TestFragmentModule.class,\n"
-                + "        parent = test.ui.TestActivity.class\n"
+                + "        parents = test.ui.TestActivity.class\n"
                 + ")\n"
                 + "public class TestFragment extends Fragment {\n"
                 + "}");
@@ -270,7 +270,7 @@ public class FragmentInjectorTest {
                 + "@Rondel(\n"
                 + "        components = TestFragmentComponent.class,\n"
                 + "        modules = TestFragmentModule.class,\n"
-                + "        parent = test.TestApp.class\n"
+                + "        parents = test.TestApp.class\n"
                 + ")\n"
                 + "public class TestFragment extends Fragment {\n"
                 + "    \n"
@@ -410,7 +410,7 @@ public class FragmentInjectorTest {
                 + "@Rondel(\n"
                 + "        components = TestFragmentComponent.class,\n"
                 + "        modules = TestFragmentModule.class,\n"
-                + "        parent = test.ui.TestActivity.class\n"
+                + "        parents = test.ui.TestActivity.class\n"
                 + ")\n"
                 + "public class TestFragment extends Fragment {\n"
                 + "    \n"
@@ -533,7 +533,7 @@ public class FragmentInjectorTest {
                 + "import test.ui.TestActivity;\n"
                 + "\n"
                 + "@Rondel(\n"
-                + "        parent = test.ui.TestActivity.class\n"
+                + "        parents = test.ui.TestActivity.class\n"
                 + ")\n"
                 + "public class TestParentFragment extends Fragment implements ComponentProvider {\n"
                 + "\n"
@@ -555,21 +555,34 @@ public class FragmentInjectorTest {
                 "\n" +
                 "import dagger.Component;\n" +
                 "\n" +
-                "@Component\n" +
                 "public interface TestFragmentComponent {\n" +
                 "    \n" +
                 "}");
+
+        JavaFileObject scopeFile = JavaFileObjects.forSourceString("test.CustomScope", "package test;\n"
+                + "\n"
+                + "import java.lang.annotation.Retention;\n"
+                + "import java.lang.annotation.RetentionPolicy;\n"
+                + "\n"
+                + "import javax.inject.Scope;\n"
+                + "\n"
+                + "@Scope @Retention(RetentionPolicy.RUNTIME)\n"
+                + "public @interface CustomScope {\n"
+                + "}\n");
+
 
         JavaFileObject fragmentParentFile = JavaFileObjects.forSourceString("test.ui.fragment.TestFragment", "package test.ui.fragment;\n"
                 + "\n"
                 + "import android.app.Fragment;\n"
                 + "import solar.blaz.rondel.Rondel;\n"
                 + "import test.ui.TestActivity;\n"
+                + "import test.CustomScope;\n"
                 + "\n"
                 + "@Rondel(\n"
                 + "        components = TestFragmentComponent.class,\n"
                 + "        modules = TestFragmentModule.class,\n"
-                + "        parent = test.ui.fragment.TestParentFragment.class\n"
+                + "        parents = test.ui.fragment.TestParentFragment.class,"
+                + "        scope = CustomScope.class\n"
                 + ")\n"
                 + "public class TestFragment extends Fragment {\n"
                 + "    \n"
@@ -615,8 +628,8 @@ public class FragmentInjectorTest {
                 + "\n"
                 + "import dagger.Subcomponent;\n"
                 + "import javax.annotation.Generated;\n"
-                + "import solar.blaz.rondel.FragmentScope;\n"
                 + "import solar.blaz.rondel.RondelComponent;\n"
+                + "import test.CustomScope;\n"
                 + "\n"
                 + "@Generated(\n"
                 + "        value = \"solar.blaz.rondel.compiler.RondelProcessor\",\n"
@@ -625,7 +638,7 @@ public class FragmentInjectorTest {
                 + "@Subcomponent(\n"
                 + "        modules = { TestFragmentModule.class }\n"
                 + ")\n"
-                + "@FragmentScope\n"
+                + "@CustomScope\n"
                 + "public interface RondelTestFragmentComponent extends RondelComponent, TestFragmentComponent {\n"
                 + "    \n"
                 + "    void inject(TestFragment view);\n"
@@ -639,7 +652,7 @@ public class FragmentInjectorTest {
                 + "}");
 
         assertAbout(javaSources())
-                .that(ImmutableList.of(appFile, activityFile, fragmentParentFile, fragmentModuleFile, fragmentComponentFile, fragmentFile))
+                .that(ImmutableList.of(appFile, activityFile, fragmentParentFile, fragmentModuleFile, fragmentComponentFile, fragmentFile, scopeFile))
                 .processedWith(new RondelProcessor(), new ComponentProcessor())
                 .compilesWithoutError()
                 .and()
@@ -691,7 +704,7 @@ public class FragmentInjectorTest {
                 + "import solar.blaz.rondel.Rondel;\n"
                 + "\n"
                 + "@Rondel(\n"
-                + "        parent = test.ui.TestActivity.class\n"
+                + "        parents = test.ui.TestActivity.class\n"
                 + ")\n"
                 + "public class TestView extends LinearLayout implements ComponentProvider {\n"
                 + "    public TestView(Context context, AttributeSet attrs) {\n"
@@ -732,7 +745,7 @@ public class FragmentInjectorTest {
                 + "@Rondel(\n"
                 + "        components = TestFragmentComponent.class,\n"
                 + "        modules = TestFragmentModule.class,\n"
-                + "        parent = test.ui.view.TestView.class\n"
+                + "        parents = test.ui.view.TestView.class\n"
                 + ")\n"
                 + "public class TestFragment extends Fragment {\n"
                 + "    \n"
@@ -903,7 +916,7 @@ public class FragmentInjectorTest {
                 + "@Rondel(\n"
                 + "        components = TestFragmentComponent.class,\n"
                 + "        modules = TestFragmentModule.class,\n"
-                + "        parent = test.ui.TestActivity.class\n"
+                + "        parents = test.ui.TestActivity.class\n"
                 + ")\n"
                 + "public class TestFragment extends Fragment {\n"
                 + "    \n"

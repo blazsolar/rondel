@@ -318,7 +318,7 @@ public class ViewInjectorTest {
                 "@Rondel(\n" +
                 "        components = TestViewComponent.class,\n" +
                 "        modules = TestViewModule.class,\n" +
-                "        parent = test.ui.TestActivity.class\n" +
+                "        parents = test.ui.TestActivity.class\n" +
                 ")\n" +
                 "public class TestView extends View {\n" +
                 "    public TestView(Context context, AttributeSet attrs) {\n" +
@@ -442,7 +442,7 @@ public class ViewInjectorTest {
                 "@Rondel(\n" +
                 "        components = TestViewComponent.class,\n" +
                 "        modules = TestViewModule.class,\n" +
-                "        parent = test.ui.TestActivity.class\n" +
+                "        parents = test.ui.TestActivity.class\n" +
                 ")\n" +
                 "public class TestView extends View {\n" +
                 "    public TestView(Context context, AttributeSet attrs) {\n" +
@@ -571,7 +571,7 @@ public class ViewInjectorTest {
                 "@Rondel(\n" +
                 "        components = TestViewComponent.class,\n" +
                 "        modules = TestViewModule.class,\n" +
-                "        parent = test.TestApp.class\n" +
+                "        parents = test.TestApp.class\n" +
                 ")\n" +
                 "public class TestView extends View {\n" +
                 "    public TestView(Context context, AttributeSet attrs) {\n" +
@@ -714,7 +714,7 @@ public class ViewInjectorTest {
                 "@Rondel(\n" +
                 "        components = TestViewComponent.class,\n" +
                 "        modules = TestViewModule.class,\n" +
-                "        parent = test.ui.fragment.TestFragment.class\n" +
+                "        parents = test.ui.fragment.TestFragment.class\n" +
                 ")\n" +
                 "public class TestView extends View {\n" +
                 "    public TestView(Context context, AttributeSet attrs) {\n" +

@@ -18,9 +18,9 @@ plugins {
     id 'java'
     id 'maven-publish'
     id 'jacoco'
-    id 'net.ltgt.apt' version '0.6'
-    id 'com.jfrog.bintray' version '1.7'
-    id 'com.github.kt3k.coveralls' version '2.6.3'
+    id 'net.ltgt.apt' version '0.9'
+//    id 'com.jfrog.bintray' version '1.7'
+//    id 'com.github.kt3k.coveralls' version '2.6.3'
 }
 
 group LIBRARY_GROUP
@@ -41,18 +41,18 @@ repositories {
 dependencies {
 
     compile project(':rondel')
-    compile 'com.google.dagger:dagger:2.5'
-    compile 'com.squareup:javapoet:1.7.0'
-    compile 'com.google.guava:guava:19.0'
-    compile 'com.google.auto:auto-common:0.6'
+    compile 'com.google.dagger:dagger:2.8'
+    compile 'com.squareup:javapoet:1.8.0'
+    compile 'com.google.guava:guava:20.0'
+    compile 'com.google.auto:auto-common:0.8'
 
-    apt 'com.google.dagger:dagger-compiler:2.5'
+    apt 'com.google.dagger:dagger-compiler:2.8'
 
     testCompile 'junit:junit:4.12'
-    testCompile 'com.google.truth:truth:0.28'
-    testCompile 'com.google.testing.compile:compile-testing:0.9'
+    testCompile 'com.google.truth:truth:0.30'
+    testCompile 'com.google.testing.compile:compile-testing:0.10'
     testCompile files(org.gradle.internal.jvm.Jvm.current().getToolsJar())
-    testCompile 'com.google.dagger:dagger-compiler:2.5'
+    testCompile 'com.google.dagger:dagger-compiler:2.8'
     testCompile files("${sdkDir}/extras/android/support/v4/android-support-v4.jar")
     testCompile files("${sdkDir}/platforms/android-24/android.jar")
 

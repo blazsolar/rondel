@@ -84,7 +84,7 @@ public class SingletonInjectorManager extends AbstractInjectorManager {
                         ImmutableList<TypeMirror> components = convertClassArrayToListOfTypes(annotationMirror, "components");
 
                         TypeElement[] modleElements = parseModuleElements(modules);
-                        TypeElement[] componentElements = parseViewComponent(components);
+                        ClassName[] componentElements = parseViewComponent(components);
 
                         ComponentModel componentModel = new ComponentModel(app);
                         componentModel.name = Constants.CLASS_PREFIX + app.getSimpleName() + "Component";
@@ -178,9 +178,8 @@ public class SingletonInjectorManager extends AbstractInjectorManager {
                 .addSuperinterface(RondelComponent.class);
 
         if (model.components != null && model.components.length > 0) {
-            for (TypeElement component : model.components) {
-                ClassName componentName = ClassName.get(component);
-                builder.addSuperinterface(componentName);
+            for (ClassName component : model.components) {
+                builder.addSuperinterface(component);
             }
         }
 
@@ -194,7 +193,7 @@ public class SingletonInjectorManager extends AbstractInjectorManager {
         ClassName component =  ClassName.get(model.component.packageName, name);
         ClassName daggerComponent =  ClassName.get(model.component.packageName, "Dagger" + name);
 
-        List<Object> formatParams = new ArrayList<Object>();
+        List<Object> formatParams = new ArrayList<>();
         formatParams.add(component);
         formatParams.add(daggerComponent);
 

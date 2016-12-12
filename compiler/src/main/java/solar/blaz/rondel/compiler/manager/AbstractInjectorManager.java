@@ -85,20 +85,20 @@ public abstract class AbstractInjectorManager {
         voidElement = elementUtils.getTypeElement(Void.class.getCanonicalName());
     }
 
-    protected TypeElement[] parseViewComponent(ImmutableList<TypeMirror> components) {
+    protected ClassName[] parseViewComponent(ImmutableList<TypeMirror> components) {
 
         if (components == null || components.size() == 0) {
             return null;
         } else {
 
-            List<TypeElement> moduleElements = new ArrayList<>();
+            List<ClassName> moduleElements = new ArrayList<>();
             for (int i = 0; i < components.size(); i++) {
                 TypeMirror componentClass = components.get(i);
 
                 TypeElement component = elementUtils.getTypeElement(componentClass.toString());
 
                 if (component.getKind() == ElementKind.INTERFACE) {
-                    moduleElements.add(component);
+                    moduleElements.add(ClassName.get(component));
                 } else {
                     messager.error("Component has to be interface.", component);
                 }
@@ -108,38 +108,45 @@ public abstract class AbstractInjectorManager {
             if (moduleElements.isEmpty()) {
                 return null;
             } else {
-                return moduleElements.toArray(new TypeElement[moduleElements.size()]);
+                return moduleElements.toArray(new ClassName[moduleElements.size()]);
             }
 
         }
 
     }
 
-    protected TypeMirror verifyParent(Element element, TypeMirror componentClass) {
+    protected TypeMirror[] verifyParent(Element element, List<TypeMirror> componentClasses) {
 
-        boolean isView = isView(element.asType());
-        boolean isFragment = isFragment(element.asType());
+        if (componentClasses != null && componentClasses.size() > 0) {
 
-        if (componentClass == null || isVoid(componentClass)) {
-            return null; // no parent (Default application)
-        } else {
+            boolean isView = isView(element.asType());
+            boolean isFragment = isFragment(element.asType());
 
-            // verify that is is provider
-            TypeElement componentProviderElement = elementUtils.getTypeElement(ComponentProvider.class.getCanonicalName());
+            TypeMirror[] classes = new TypeMirror[componentClasses.size()];
 
-            if (isView || isFragment) {
-                if (typesUtil.isSubtype(componentClass, componentProviderElement.asType())) {
-                    return componentClass;
+            for (int i = 0; i < componentClasses.size(); i++) {
+
+                TypeMirror componentClass = componentClasses.get(i);
+                classes[i] = componentClass;
+
+                // verify that is is provider
+                TypeElement componentProviderElement = elementUtils.getTypeElement(ComponentProvider.class.getCanonicalName());
+
+                if (isView || isFragment) {
+                    if (!typesUtil.isSubtype(componentClass, componentProviderElement.asType())) {
+                        messager.error("Parent does not provide component.", element);
+                    }
                 } else {
-                    messager.error("Parent does not provide component.", element);
+                    messager.error("Only Views and Fragments can specify parents.", element);
                 }
-            } else {
-                messager.error("Only Views and Fragments can specify parent.", element);
+
             }
 
-        }
+            return classes;
 
-        return null;
+        } else {
+            return null;
+        }
 
     }
 
@@ -347,14 +354,7 @@ public abstract class AbstractInjectorManager {
             List<MethodSpec> methods = new ArrayList<>(children.size());
 
             for (ComponentModel child : children) {
-
-                String name = child.name;
-
-                methods.add(MethodSpec.methodBuilder(Character.toLowerCase(name.charAt(0)) + name.substring(1) + "Builder")
-                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                        .returns(ClassName.get(child.packageName, name, "Builder"))
-                        .build());
-
+                methods.add(getChildMethodBuilder(child));
             }
 
             return methods;
@@ -365,6 +365,13 @@ public abstract class AbstractInjectorManager {
 
     }
 
+    protected MethodSpec getChildMethodBuilder(ComponentModel child) {
+        String name = child.name;
+        return MethodSpec.methodBuilder(Character.toLowerCase(name.charAt(0)) + name.substring(1) + "Builder")
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                .returns(ClassName.get(child.packageName, name, "Builder"))
+                .build();
+    }
 
     protected AnnotationSpec getGeneratedAnnotation() {
         return AnnotationSpec.builder(Generated.class)
@@ -433,5 +440,4 @@ public abstract class AbstractInjectorManager {
                     throw new TypeNotPresentException(o.toString(), null);
                 }
             };
-
 }

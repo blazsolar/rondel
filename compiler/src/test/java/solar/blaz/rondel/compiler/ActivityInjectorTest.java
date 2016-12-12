@@ -746,7 +746,7 @@ public class ActivityInjectorTest {
                 "@Rondel(\n" +
                 "        components = TestComponent.class,\n" +
                 "        modules = TestModule.class,\n" +
-                "        parent = test.TestApp.class\n" +
+                "        parents = test.TestApp.class\n" +
                 ")\n" +
                 "public class TestActivity extends Activity {\n" +
                 "    \n" +
@@ -756,7 +756,7 @@ public class ActivityInjectorTest {
                 .that(ImmutableList.of(appFile, moduleFile, componentFile, activityFile, activityModuleFile, activityComponentFile))
                 .processedWith(new RondelProcessor(), new ComponentProcessor())
                 .failsToCompile()
-                .withErrorContaining("Only Views and Fragments can specify parent.");
+                .withErrorContaining("Only Views and Fragments can specify parents.");
 
     }
 

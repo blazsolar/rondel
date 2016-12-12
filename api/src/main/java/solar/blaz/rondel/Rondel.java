@@ -32,7 +32,7 @@ public @interface Rondel {
 
     Class<?>[] modules() default {};
 
-    Class<?> parent() default Void.class;
+    Class<?>[] parents() default {};
 
     Class<?> scope() default Void.class;
 
