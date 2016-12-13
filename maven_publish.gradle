@@ -33,14 +33,17 @@ publishing {
         maven {
             url mavenRepoUrl
             credentials(AwsCredentials) {
-                accessKey hasProperty('kaminoMavenAccessKey') ? kaminoMavenAccessKey : ''
-                secretKey hasProperty('kaminoMavenSecretKey') ? kaminoMavenSecretKey : ''
+                accessKey kaminoMavenAccessKey
+                secretKey kaminoMavenSecretKey
             }
         }
     }
     publications {
         mavenJava(MavenPublication) {
             from components.java
+            groupId LIBRARY_GROUP
+            artifactId project.name
+            version LIBRARY_VERSION
         }
 //        bintray(MavenPublication) {
 //            from components.java
