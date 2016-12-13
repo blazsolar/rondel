@@ -33,8 +33,8 @@ publishing {
         maven {
             url mavenRepoUrl
             credentials(AwsCredentials) {
-                accessKey kaminoMavenAccessKey
-                secretKey kaminoMavenSecretKey
+                accessKey project.hasProperty('kaminoMavenAccessKey') ? kaminoMavenAccessKey : ''
+                secretKey project.hasProperty('kaminoMavenSecretKey') ? kaminoMavenSecretKey : ''
             }
         }
     }
